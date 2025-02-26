@@ -59,7 +59,7 @@ export class MyTangram extends CGFobject {
         
         //Orange Triangle
         this.scene.pushMatrix()
-        this.scene.translate(-1.5, 1.82, 0)
+        this.scene.translate(-1.5, 1.825, 0)
         this.scene.rotate(135 * Math.PI / 180, 0, 0, 1)
         this.scene.setDiffuse(255 / 255, 150 / 255, 0 / 255, 0)
         this.triangleBig.display()
@@ -83,7 +83,7 @@ export class MyTangram extends CGFobject {
         
         //Red Triangle
         this.scene.pushMatrix()
-        this.scene.translate(-2.92, 0, 0)
+        this.scene.translate(-2.91, 0, 0)
         this.scene.rotate(90 * Math.PI / 180, 0, 0, 1)
         this.scene.setDiffuse(1, 0, 0, 0)
         this.triangleSmall.display()
