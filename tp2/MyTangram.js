@@ -24,7 +24,7 @@ export class MyTangram extends CGFobject {
     display (){
 
         this.scene.pushMatrix();
-        this.scene.translate(1, 0.3, 0)
+        this.scene.translate(1, 0, 0)
 
         
         this.scene.pushMatrix();
