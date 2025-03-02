@@ -5,6 +5,7 @@ import { MyParallelogram } from "./MyParallelogram.js";
 import { MyTriangleSmall } from "./MyTriangleSmall.js";
 import { MyTriangleBig } from "./MyTriangleBig.js";
 import { MyTangram } from "./MyTangram.js";
+import { MyUnitCube } from "./MyUnitCube.js";
 
 /**
  * MyScene
@@ -36,6 +37,7 @@ export class MyScene extends CGFscene {
     this.triangleSmall = new MyTriangleSmall(this);
     this.triangleBig = new MyTriangleBig(this);
     this.tangram = new MyTangram(this);
+    this.unitCube = new MyUnitCube(this);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
@@ -44,7 +46,9 @@ export class MyScene extends CGFscene {
     this.displayParallelogram = false;
     this.displayTriangleSmall = false;
     this.displayTriangleBig = false;
-    this.displayTangram = true;
+    this.displayTangram = false;
+    this.displayUnitCube = false;
+    this.displayUnitCubeTangram = true;
     this.scaleFactor = 1;
   }
   initLights() {
@@ -112,11 +116,26 @@ export class MyScene extends CGFscene {
     if (this.displayParallelogram) this.parallelogram.display();
     if (this.displayTriangleSmall) this.triangleSmall.display();
     if (this.displayTriangleBig) this.triangleBig.display();
+    if(this.displayTangram)this.tangram.display();
+    if(this.displayUnitCube)this.unitCube.display();
+    if(this.displayUnitCubeTangram){
+      this.pushMatrix();
+      this.translate(2.2, -2.21, 2.2);
+      this.setDiffuse(1, 1, 1, 0);
+      this.scale(4.4,4.4,4.4)
+      this.unitCube.display();
+      this.popMatrix();
 
-    if(this.displayTangram){
-      this.tangram.display()
+      this.pushMatrix();
+      this.rotate(270 * Math.PI / 180, 1, 0, 0);
+      this.translate(2, -2.3, 0);
+      this.scale(0.5, 0.5, 0.5);
+      this.setDiffuse(1, 1, 1, 0);
+      this.tangram.display();
+      this.popMatrix();
+
     }
-
+    
 
 
     // ---- END Primitive drawing section
