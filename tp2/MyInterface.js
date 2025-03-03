@@ -27,6 +27,7 @@ export class MyInterface extends CGFinterface {
         this.gui.add(this.scene, 'displayTangram').name('Tangram');
         this.gui.add(this.scene, 'displayUnitCube').name('UnitCube');
         this.gui.add(this.scene, 'displayUnitCubeTangram').name('UnitCubeTangram');
+        this.gui.add(this.scene, 'displayUnitCubeQuad').name('UnitCubeQuad');   
 
 
         //Slider element in GUI
