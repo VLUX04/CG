@@ -32,28 +32,28 @@ export class MyTangram extends CGFobject {
 
         // Triangle purple
         this.trianglePurpleMaterial = new CGFappearance(this.scene);
-        this.trianglePurpleMaterial.setAmbient(0, 1, 0, 1.0);
+        this.trianglePurpleMaterial.setAmbient(1, 0, 0, 1.0);
         this.trianglePurpleMaterial.setDiffuse(76 / 255, 0 / 255, 153 / 255, 0)
         this.trianglePurpleMaterial.setSpecular(0.9, 0.9, 0.9, 1.0);
         this.trianglePurpleMaterial.setShininess(10.0);
 
         // Triangle pink
         this.trianglePinkMaterial = new CGFappearance(this.scene);
-        this.trianglePinkMaterial.setAmbient(0, 1, 0, 1.0);
+        this.trianglePinkMaterial.setAmbient(0, 1, 1, 1.0);
         this.trianglePinkMaterial.setDiffuse(255 / 255, 153 / 255, 204 / 255, 0);
         this.trianglePinkMaterial.setSpecular(0.9, 0.9, 0.9, 1.0);
         this.trianglePinkMaterial.setShininess(10.0);
 
         // Triangle orange
         this.triangleOrangeMaterial = new CGFappearance(this.scene);
-        this.triangleOrangeMaterial.setAmbient(0, 1, 0, 1.0);
+        this.triangleOrangeMaterial.setAmbient(1, 1, 0, 1.0);
         this.triangleOrangeMaterial.setDiffuse(255 / 255, 128 / 255, 0 / 255, 0)
         this.triangleOrangeMaterial.setSpecular(0.9, 0.9, 0.9, 1.0);
         this.triangleOrangeMaterial.setShininess(10.0);
 
         // Triangle blue
         this.triangleBlueMaterial = new CGFappearance(this.scene);
-        this.triangleBlueMaterial.setAmbient(0, 1, 0, 1.0);
+        this.triangleBlueMaterial.setAmbient(1, 0, 1, 1.0);
         this.triangleBlueMaterial.setDiffuse(0, 0, 1, 0)
         this.triangleBlueMaterial.setSpecular(0.9, 0.9, 0.9, 1.0);
         this.triangleBlueMaterial.setShininess(10.0);
@@ -67,7 +67,7 @@ export class MyTangram extends CGFobject {
 
         //  aralellogram
         this.paralellogramMaterial = new CGFappearance(this.scene);
-        this.paralellogramMaterial.setAmbient(0, 1, 0, 1.0);
+        this.paralellogramMaterial.setAmbient(1, 1, 1, 1.0);
         this.paralellogramMaterial.setDiffuse(1, 1, 0, 0);
         this.paralellogramMaterial.setSpecular(0.9, 0.9, 0.9, 1.0);
         this.paralellogramMaterial.setShininess(10.0);
