@@ -134,9 +134,9 @@ export class MyScene extends CGFscene {
 
         // Wood
         this.material4 = new CGFappearance(this);
-        this.material4.setAmbient(43/255,19/255,21/255, 1.0);
-        this.material4.setDiffuse(139/255,105/255,20/255, 1.0);
-        this.material4.setSpecular(0, 0, 0, 1.0);
+        this.material4.setAmbient(0.6, 0.4, 0.2, 1.0);
+        this.material4.setDiffuse(0, 0, 0, 1.0);
+        this.material4.setSpecular(0.3, 0, 0, 1.0);
         this.material4.setShininess(10.0);
 
         // Custom material (can be changed in the interface)
