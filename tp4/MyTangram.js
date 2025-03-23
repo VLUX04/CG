@@ -15,8 +15,10 @@ export class MyTangram extends CGFobject {
         super(scene);
         this.diamond = new MyDiamond(this.scene);
         this.triangle = new MyTriangle(this.scene);
-        this.triangleBig = new MyTriangleBig(this.scene);
-        this.triangleSmall = new MyTriangleSmall(this.scene);
+        this.triangleBlue = new MyTriangleBig(this.scene, [0, 0, 0.5, 0.5, 1, 0]);
+        this.triangleOrange = new MyTriangleBig(this.scene, [1, 0, 1, 1, 0.5, 0.5]);
+        this.trianglePurple = new MyTriangleSmall(this.scene, [0, 0, 0, 0.5, 0.25, 0.25]);
+        this.triangleRed = new MyTriangleSmall(this.scene, [0.25, 0.75, 0.75, 0.75, 0.5, 0.5]);
         this.parallelogram = new MyParallelogram(this.scene);
         this.initMaterials();
     }
@@ -107,7 +109,7 @@ export class MyTangram extends CGFobject {
         this.scene.translate(-1.5, -1, 0)
         this.scene.rotate(315 * Math.PI / 180, 0, 0, 1)
         this.triangleBlueMaterial.apply()
-        this.triangleBig.display()
+        this.triangleBlue.display()
         this.scene.popMatrix()
         
         //Pink Triangle
@@ -123,7 +125,7 @@ export class MyTangram extends CGFobject {
         this.scene.translate(-1.5, 1.825, 0)
         this.scene.rotate(135 * Math.PI / 180, 0, 0, 1)
         this.triangleOrangeMaterial.apply()
-        this.triangleBig.display()
+        this.triangleOrange.display()
         this.scene.popMatrix()
         
         //Purple Triangle
@@ -131,7 +133,7 @@ export class MyTangram extends CGFobject {
         this.scene.translate(-3.62, 3.4, 0)
         this.scene.rotate(225 * Math.PI / 180, 0, 0, 1)
         this.trianglePurpleMaterial.apply()
-        this.triangleSmall.display()
+        this.trianglePurple.display()
         this.scene.popMatrix()
         
         //Parallelogram
@@ -147,11 +149,10 @@ export class MyTangram extends CGFobject {
         this.scene.translate(-2.91, 0, 0)
         this.scene.rotate(90 * Math.PI / 180, 0, 0, 1)
         this.triangleRedMaterial.apply()
-        this.triangleSmall.display()
+        this.triangleRed.display()
         this.scene.popMatrix()
 
         this.scene.popMatrix()
-
     }
 
     enableNormalViz(){
