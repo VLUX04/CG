@@ -27,7 +27,7 @@ export class MyTangram extends CGFobject {
         this.diamondMaterial = new CGFappearance(this.scene)
         this.diamondMaterial.setAmbient(0, 1, 0, 1.0)
         this.diamondMaterial.setDiffuse(0, 1, 0, 0)
-        this.diamondMaterial.setSpecular(0.1, 0.1, 0.1, 1.0);
+        this.diamondMaterial.setSpecular(0.1, 0.1, 0.1, 1.0)
         this.diamondMaterial.setShininess(10.0)
 
         // Triangle purple
@@ -71,6 +71,14 @@ export class MyTangram extends CGFobject {
         this.paralellogramMaterial.setDiffuse(1, 1, 0, 0)
         this.paralellogramMaterial.setSpecular(0.1, 0.1, 0.1, 1.0)
         this.paralellogramMaterial.setShininess(10.0)
+
+        // Tangram texture
+        this.texture = new CGFappearance(this.scene)
+        this.texture.setAmbient(0.1, 0.1, 0.1, 1)
+        this.texture.setDiffuse(0.9, 0.9, 0.9, 1)
+        this.texture.setSpecular(0.1, 0.1, 0.1, 1)
+        this.texture.setShininess(10.0)
+        this.texture.loadTexture('images/tangram.png')
     }
     
 
@@ -80,6 +88,7 @@ export class MyTangram extends CGFobject {
         this.scene.translate(1, 0, 0)
 
         
+        // Diamond with Tangram texture
         this.scene.pushMatrix()
         let translationMatrix = [
             1, 0, 0, 0,
@@ -89,11 +98,9 @@ export class MyTangram extends CGFobject {
         ]
 
         this.scene.multMatrix(translationMatrix)
-        this.scene.setDiffuse(0, 255 / 255, 0, 0)
-        this.scene.customMaterial.apply()
+        this.texture.apply()
         this.diamond.display()
         this.scene.popMatrix()
-        
         
         //Blue triangle
         this.scene.pushMatrix()
