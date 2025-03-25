@@ -15,8 +15,8 @@ export class MyTangram extends CGFobject {
         super(scene);
         this.diamond = new MyDiamond(this.scene);
         this.triangle = new MyTriangle(this.scene);
-        this.triangleBlue = new MyTriangleBig(this.scene, [0, 0, 0.5, 0.5, 1, 0]);
-        this.triangleOrange = new MyTriangleBig(this.scene, [1, 0, 1, 1, 0.5, 0.5]);
+        this.triangleBlue = new MyTriangleBig(this.scene, [0.0, 0.0, 1.0, 1.0, 0.5, 0.5]);
+        this.triangleOrange = new MyTriangleBig(this.scene, [1.0, 1.0, 1.0, 0.0, 0.5, 0.5]);
         this.trianglePurple = new MyTriangleSmall(this.scene, [0, 0, 0, 0.5, 0.25, 0.25]);
         this.triangleRed = new MyTriangleSmall(this.scene, [0.25, 0.75, 0.75, 0.75, 0.5, 0.5]);
         this.parallelogram = new MyParallelogram(this.scene);
@@ -38,6 +38,7 @@ export class MyTangram extends CGFobject {
         this.trianglePurpleMaterial.setDiffuse(76 / 255, 0 / 255, 153 / 255, 0)
         this.trianglePurpleMaterial.setSpecular(0, 0, 0, 1.0)
         this.trianglePurpleMaterial.setShininess(10.0)
+        this.trianglePurpleMaterial.loadTexture('images/tangram.png')
 
         // Triangle pink
         this.trianglePinkMaterial = new CGFappearance(this.scene)
@@ -45,6 +46,7 @@ export class MyTangram extends CGFobject {
         this.trianglePinkMaterial.setDiffuse(255 / 200, 153 / 255, 204 / 255, 0)
         this.trianglePinkMaterial.setSpecular(0.1, 0.1, 0.1, 1.0)
         this.trianglePinkMaterial.setShininess(10.0)
+        this.trianglePinkMaterial.loadTexture('images/tangram.png')
 
         // Triangle orange
         this.triangleOrangeMaterial = new CGFappearance(this.scene)
@@ -52,6 +54,7 @@ export class MyTangram extends CGFobject {
         this.triangleOrangeMaterial.setDiffuse(255 / 255, 140 / 255, 0 / 255, 0)
         this.triangleOrangeMaterial.setSpecular(0.1, 0.1, 0.1, 1.0)
         this.triangleOrangeMaterial.setShininess(10.0)
+        this.triangleOrangeMaterial.loadTexture('images/tangram.png')
 
         // Triangle blue
         this.triangleBlueMaterial = new CGFappearance(this.scene)
@@ -59,13 +62,15 @@ export class MyTangram extends CGFobject {
         this.triangleBlueMaterial.setDiffuse(0 / 255, 150 / 255, 255 / 255, 0)
         this.triangleBlueMaterial.setSpecular(0.1, 0.1, 0.1, 1.0)
         this.triangleBlueMaterial.setShininess(10.0);
+        this.triangleBlueMaterial.loadTexture('images/tangram.png')
 
         // Triangle red
         this.triangleRedMaterial = new CGFappearance(this.scene)
         this.triangleRedMaterial.setAmbient(0, 1, 0, 1.0)
         this.triangleRedMaterial.setDiffuse(1, 0, 0, 0)
         this.triangleRedMaterial.setSpecular(0.1, 0.1, 0.1, 1.0)
-        this.triangleRedMaterial.setShininess(10.0)    
+        this.triangleRedMaterial.setShininess(10.0) 
+        this.triangleRedMaterial.loadTexture('images/tangram.png')
 
         // Paralellogram
         this.paralellogramMaterial = new CGFappearance(this.scene)
@@ -73,6 +78,7 @@ export class MyTangram extends CGFobject {
         this.paralellogramMaterial.setDiffuse(1, 1, 0, 0)
         this.paralellogramMaterial.setSpecular(0.1, 0.1, 0.1, 1.0)
         this.paralellogramMaterial.setShininess(10.0)
+        this.paralellogramMaterial.loadTexture('images/tangram.png')
 
         // Tangram texture
         this.texture = new CGFappearance(this.scene)
@@ -89,8 +95,7 @@ export class MyTangram extends CGFobject {
         this.scene.pushMatrix()
         this.scene.translate(1, 0, 0)
 
-        
-        // Diamond with Tangram texture
+        // Diamond 
         this.scene.pushMatrix()
         let translationMatrix = [
             1, 0, 0, 0,
