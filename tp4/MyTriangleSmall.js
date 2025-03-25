@@ -5,13 +5,12 @@ import {CGFobject} from '../lib/CGF.js';
  * @param scene - Reference to MyScene object
  */
 export class MyTriangleSmall extends CGFobject {
-    constructor(scene, textCords) {
+    constructor(scene, texCords) {
         super(scene);
-        this.texCords = textCords;
-        this.initBuffers();
+        this.initBuffers(texCords);
     }
     
-    initBuffers() {
+    initBuffers(texCords) {
         this.vertices = [
             -1, 0, 0,	//0
             1, 0, 0,	//1
@@ -28,6 +27,8 @@ export class MyTriangleSmall extends CGFobject {
 			0,0,1,
 			0,0,1,
 		]
+
+        this.texCoords = texCords;
 
         //The defined indices (and corresponding vertices)
         //will be read in groups of three to draw triangles
