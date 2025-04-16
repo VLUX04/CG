@@ -1,5 +1,6 @@
   import { CGFscene, CGFcamera, CGFaxis, CGFappearance} from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
+import { MySphere } from "./MySphere.js";
 
 /**
  * MyScene
@@ -30,6 +31,16 @@ export class MyScene extends CGFscene {
     //Initialize scene objects
     this.axis = new CGFaxis(this, 20, 1);
     this.plane = new MyPlane(this, 64);
+    this.skySphere = new MySphere(this, 32, 16);
+
+    // Load sky texture
+    this.earthTexture = new CGFappearance(this);
+    this.earthTexture.setAmbient(0.3, 0.3, 0.3, 1);
+    this.earthTexture.setDiffuse(0.7, 0.7, 0.7, 1);
+    this.earthTexture.setSpecular(0.0, 0.0, 0.0, 1);
+    this.earthTexture.setShininess(10.0);
+    this.earthTexture.loadTexture("textures/earth.jpg");
+    this.earthTexture.setTextureWrap("CLAMP_TO_EDGE", "CLAMP_TO_EDGE");
 
     this.grassTexture = new CGFappearance(this);
     this.grassTexture.setAmbient(0.3, 0.3, 0.3, 1);
@@ -103,6 +114,12 @@ export class MyScene extends CGFscene {
     this.scale(400, 1, 400);
     this.rotate(-Math.PI / 2, 1, 0, 0);
     this.plane.display();
+    this.popMatrix();
+
+    this.pushMatrix();
+    this.earthTexture.apply();
+    this.scale(50, 50, 50);
+    this.skySphere.display();
     this.popMatrix();
   }
 }
