@@ -19,6 +19,12 @@ export class MyInterface extends CGFinterface {
 
         this.initKeys();
 
+        const buildingFolder = this.gui.addFolder("Building Controls");
+        buildingFolder.add(this.scene, "centralWidth", 5, 20).name("Central Width").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "sideWidth", 3, 15).name("Side Width").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "numFloors", 1, 10, 1).name("Floors").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "numWindows", 1, 5, 1).name("Windows").onChange(() => this.scene.updateBuilding());
+
         return true;
     }
 

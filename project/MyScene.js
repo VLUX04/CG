@@ -10,6 +10,10 @@ import { MyBuilding } from "./MyBuilding.js";
 export class MyScene extends CGFscene {
   constructor() {
     super();
+    this.centralWidth = 5;
+    this.sideWidth = 3.75; 
+    this.numFloors = 3;
+    this.numWindows = 2;
   }
   init(application) {
     super.init(application);
@@ -37,11 +41,12 @@ export class MyScene extends CGFscene {
 
     this.building = new MyBuilding(
       this,
-      13, 
-      3,  
-      2,  
-      "textures/window.jpg", 
-      [1, 1, 1] 
+      this.centralWidth,
+      this.sideWidth,
+      this.numFloors,
+      this.numWindows,
+      "textures/window.jpg",
+      [1, 1, 1]
   );
 
     this.panorama = new MyPanorama(this, "textures/sky.jpg");
@@ -90,6 +95,17 @@ export class MyScene extends CGFscene {
   update(t) {
     this.checkKeys();
   }
+  updateBuilding() {
+    this.building = new MyBuilding(
+        this,
+        this.centralWidth,
+        this.sideWidth,
+        this.numFloors,
+        this.numWindows,
+        "textures/window.jpg",
+        [1, 1, 1]
+    );
+  }
 
   setDefaultAppearance() {
     this.setAmbient(0.5, 0.5, 0.5, 1.0);
@@ -124,6 +140,7 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
     this.scale(2, 2, 2); 
+    this.translate(0, 0, 0); // Move the panorama slightly back
     this.building.display();
     this.popMatrix();
 
