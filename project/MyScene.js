@@ -11,7 +11,7 @@ export class MyScene extends CGFscene {
   constructor() {
     super();
     this.centralWidth = 5;
-    this.sideWidth = 3.75; 
+    this.sideWidthPerc = 0.75; 
     this.numFloors = 3;
     this.numWindows = 2;
   }
@@ -42,7 +42,7 @@ export class MyScene extends CGFscene {
     this.building = new MyBuilding(
       this,
       this.centralWidth,
-      this.sideWidth,
+      this.sideWidthPerc,
       this.numFloors,
       this.numWindows,
       "textures/window.jpg",
@@ -99,7 +99,7 @@ export class MyScene extends CGFscene {
     this.building = new MyBuilding(
         this,
         this.centralWidth,
-        this.sideWidth,
+        this.sideWidthPerc,
         this.numFloors,
         this.numWindows,
         "textures/window.jpg",

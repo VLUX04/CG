@@ -4,10 +4,10 @@ import { MyBox } from "./MyBox.js";
 import { MyQuad } from "./MyQuad.js";
 
 export class MyBuilding extends CGFobject {
-    constructor(scene, centralWidth, sideWidth, numFloors, numWindows, windowTexture, buildingColor) {
+    constructor(scene, centralWidth, sideWidthPerc, numFloors, numWindows, windowTexture, buildingColor) {
         super(scene);
         this.centralWidth = centralWidth;
-        this.sideWidth = sideWidth;
+        this.sideWidth = Math.min(centralWidth * sideWidthPerc, 15);
         this.numFloors = numFloors;
         this.numWindows = numWindows;
         this.window = new MyWindow(scene, windowTexture);
