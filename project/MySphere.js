@@ -32,7 +32,7 @@ export class MySphere extends CGFobject {
                 const z = cosAngle1 * sinAngle2;
                 this.vertices.push(x, y, z);
 
-                this.normals.push(x, y, z);
+                this.normals.push(-x, -y, -z);
 
                 const u = slice / this.slices;
                 const v = 1 - stack / (2 * this.stacks);
@@ -45,8 +45,8 @@ export class MySphere extends CGFobject {
                 const first = stack * (this.slices + 1) + slice;
                 const second = first + this.slices + 1;
 
-                this.indices.push(first, second, first + 1);
-                this.indices.push(second, second + 1, first + 1);
+                this.indices.push(first, first + 1, second);
+                this.indices.push(second, first + 1, second + 1);
             }
         }
 
