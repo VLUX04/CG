@@ -1,6 +1,7 @@
   import { CGFscene, CGFcamera, CGFaxis, CGFappearance} from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
+import { MyBuilding } from "./MyBuilding.js";
 
 /**
  * MyScene
@@ -22,6 +23,8 @@ export class MyScene extends CGFscene {
     this.gl.clearDepth(100.0);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.depthFunc(this.gl.LEQUAL);
 
     this.enableTextures(true);
@@ -31,6 +34,15 @@ export class MyScene extends CGFscene {
     //Initialize scene objects
     this.axis = new CGFaxis(this, 20, 1);
     this.plane = new MyPlane(this, 64);
+
+    this.building = new MyBuilding(
+      this,
+      13, 
+      3,  
+      2,  
+      "textures/window.jpg", 
+      [1, 1, 1] 
+  );
 
     this.panorama = new MyPanorama(this, "textures/sky.jpg");
 
@@ -109,5 +121,11 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
     this.panorama.display(this.camera.position);
+
+    this.pushMatrix();
+    this.scale(2, 2, 2); 
+    this.building.display();
+    this.popMatrix();
+
   }
 }

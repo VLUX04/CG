@@ -16,10 +16,10 @@ export class MyPlane extends CGFobject {
 		nrDivs = typeof nrDivs !== 'undefined' ? nrDivs : 1;
 		this.nrDivs = nrDivs;
 		this.patchLength = 1.0 / nrDivs;
-		this.minS = minS || 0;
-		this.maxS = maxS || 1;
-		this.minT = minT || 0;
-		this.maxT = maxT || 1;
+		this.minS = 0;
+		this.maxS = 10;
+		this.minT = 0;
+		this.maxT = 10;
 		this.q = (this.maxS - this.minS) / this.nrDivs;
 		this.w = (this.maxT - this.minT) / this.nrDivs;
 		this.initBuffers();
