@@ -140,7 +140,7 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
     this.scale(2, 2, 2); 
-    this.translate(0, 0, 0); // Move the panorama slightly back
+    this.translate(0, 0, 0);
     this.building.display();
     this.popMatrix();
 
