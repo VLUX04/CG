@@ -2,6 +2,7 @@
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
+import { MyTree } from "./MyTree.js";
 
 /**
  * MyScene
@@ -21,7 +22,6 @@ export class MyScene extends CGFscene {
     this.initCameras();
     this.initLights();
 
-    //Background color
     this.gl.clearColor(0, 0, 0, 1.0);
 
     this.gl.clearDepth(100.0);
@@ -47,7 +47,9 @@ export class MyScene extends CGFscene {
       this.numWindows,
       "textures/window.jpg",
       [1, 1, 1]
-  );
+    );
+
+    this.tree = new MyTree(this, 10, "X", 0.66, 3, [0.2, 0.8, 0.2]);
 
     this.panorama = new MyPanorama(this, "textures/sky.jpg");
 
@@ -70,7 +72,7 @@ export class MyScene extends CGFscene {
       1,
       0.1,
       1000,
-      vec3.fromValues(100, 100, 100),
+      vec3.fromValues(15, 3, 0),
       vec3.fromValues(0, 0, 0)
     );
   }
@@ -125,7 +127,6 @@ export class MyScene extends CGFscene {
     this.applyViewMatrix();
 
     // Draw axis
-    this.axis.display();
 
     this.setDefaultAppearance();
 
@@ -140,8 +141,13 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
     this.scale(2, 2, 2); 
-    this.translate(0, 0, 0);
+    this.translate(0, 0, -20);
     this.building.display();
+    this.popMatrix();
+
+    this.pushMatrix();
+    this.translate(0, 0, 0); 
+    this.tree.display();
     this.popMatrix();
 
   }
