@@ -2,11 +2,11 @@
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
-import { MyTree } from "./MyTree.js";
+import { MyForest } from "./MyForest.js";
 
 /**
  * MyScene
- * @constructor
+ * @constructor 
  */
 export class MyScene extends CGFscene {
   constructor() {
@@ -15,6 +15,11 @@ export class MyScene extends CGFscene {
     this.sideWidthPerc = 0.75; 
     this.numFloors = 3;
     this.numWindows = 2;
+
+    this.forestRows = 5; 
+    this.forestCols = 4;
+    this.forestWidth = 20; 
+    this.forestHeight = 20;
   }
   init(application) {
     super.init(application);
@@ -49,7 +54,8 @@ export class MyScene extends CGFscene {
       [1, 1, 1]
     );
 
-    this.tree = new MyTree(this, 10, "X", 0.66, 3, [0.2, 0.8, 0.2]);
+
+    this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight);
 
     this.panorama = new MyPanorama(this, "textures/sky.jpg");
 
@@ -108,6 +114,9 @@ export class MyScene extends CGFscene {
         [1, 1, 1]
     );
   }
+  updateForest() {
+    this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight);
+  }
 
   setDefaultAppearance() {
     this.setAmbient(0.5, 0.5, 0.5, 1.0);
@@ -146,9 +155,7 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
     this.pushMatrix();
-    this.translate(0, 0, 0); 
-    this.tree.display();
+    this.forest.display(); 
     this.popMatrix();
-
   }
 }
