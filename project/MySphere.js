@@ -1,10 +1,11 @@
 import { CGFobject } from "../lib/CGF.js";
 
 export class MySphere extends CGFobject {
-    constructor(scene, slices, stacks) {
+    constructor(scene, slices, stacks, inverted = false) {
         super(scene);
         this.slices = slices; 
         this.stacks = stacks; 
+        this.inverted = inverted; 
         this.initBuffers();
     }
 
@@ -32,7 +33,12 @@ export class MySphere extends CGFobject {
                 const z = cosAngle1 * sinAngle2;
                 this.vertices.push(x, y, z);
 
-                this.normals.push(-x, -y, -z);
+
+                if (this.inverted) {
+                    this.normals.push(-x, -y, -z); 
+                } else {
+                    this.normals.push(x, y, z); 
+                }
 
                 const u = slice / this.slices;
                 const v = 1 - stack / (2 * this.stacks);
@@ -45,8 +51,13 @@ export class MySphere extends CGFobject {
                 const first = stack * (this.slices + 1) + slice;
                 const second = first + this.slices + 1;
 
-                this.indices.push(first, first + 1, second);
-                this.indices.push(second, first + 1, second + 1);
+                if (this.inverted) {
+                    this.indices.push(first, first + 1, second);
+                    this.indices.push(second, first + 1, second + 1);
+                } else {
+                    this.indices.push(first, second, first + 1);
+                    this.indices.push(second + 1, first + 1, second);
+                }
             }
         }
 

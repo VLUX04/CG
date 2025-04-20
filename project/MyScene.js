@@ -3,6 +3,7 @@ import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
 import { MyForest } from "./MyForest.js";
+import { MyHeli } from "./MyHeli.js";
 
 /**
  * MyScene
@@ -40,9 +41,9 @@ export class MyScene extends CGFscene {
 
     this.setUpdatePeriod(50);
 
-    //Initialize scene objects
     this.axis = new CGFaxis(this, 20, 1);
     this.plane = new MyPlane(this, 64);
+    this.helicopter = new MyHeli(this);
 
     this.building = new MyBuilding(
       this,
@@ -155,7 +156,15 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
     this.pushMatrix();
+    this.translate(-20, 0, 0);
     this.forest.display(); 
     this.popMatrix();
+
+    this.pushMatrix();
+    this.scale(0.6,0.6,0.6)
+    this.translate(0, 5, 0);
+    this.helicopter.display();
+    this.popMatrix();
+    
   }
 }
