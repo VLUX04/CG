@@ -3,7 +3,7 @@ import { MyPyramid } from "./MyPyramid.js";
 import { MyTruncatedCone } from "./MyTruncatedCone.js";
 
 export class MyTree extends CGFobject {
-    constructor(scene, inclination, rotationAxis, trunkRadius, treeHeight, canopyColor) {
+    constructor(scene, inclination, rotationAxis, trunkRadius, treeHeight, canopyColor, trunkTexture) {
         super(scene);
 
         this.inclination = inclination; 
@@ -22,6 +22,8 @@ export class MyTree extends CGFobject {
         this.trunkMaterial.setDiffuse(0.6, 0.3, 0.15, 1);
         this.trunkMaterial.setSpecular(0.1, 0.05, 0.025, 1);
         this.trunkMaterial.setShininess(10.0);
+        this.trunkMaterial.loadTexture(trunkTexture);
+        this.trunkMaterial.setTextureWrap("REPEAT", "REPEAT");
 
         this.canopyMaterial = new CGFappearance(scene);
         this.canopyMaterial.setAmbient(canopyColor[0], canopyColor[1], canopyColor[2], 1);
