@@ -42,7 +42,7 @@ export class MyTruncatedCone extends CGFobject {
             this.indices.push(bottomLeft, topLeft, topRight);
         }
 
-        const bottomCenterIndex = this.vertices.length / 3;
+        /*const bottomCenterIndex = this.vertices.length / 3;
         this.vertices.push(0, 0, 0); 
         this.normals.push(0, -1, 0); 
         this.texCoords.push(0.5, 0.5);
@@ -80,7 +80,7 @@ export class MyTruncatedCone extends CGFobject {
                 const current = topCenterIndex + i + 1;
                 this.indices.push(topCenterIndex, current + 1, current);
             }
-        }
+        }*/
     
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();
