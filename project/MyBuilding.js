@@ -54,7 +54,8 @@ export class MyBuilding extends CGFobject {
     drawModule(floors, isCentral = false) {
 
         this.scene.pushMatrix();
-        this.scene.scale(isCentral ? this.centralWidth : this.sideWidth, isCentral ? floors + 3 : floors + 2, isCentral ? this.depth * 1.25 : this.depth);
+        this.scene.scale(isCentral ? this.centralWidth : this.sideWidth, floors , isCentral ? this.depth * 1.25 : this.depth);
+        this.scene.translate(0, 0.5, 0);
         this.buildingMaterial.apply();
         this.box.display(); 
         this.scene.popMatrix();
