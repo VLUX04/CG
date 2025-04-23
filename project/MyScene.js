@@ -58,7 +58,7 @@ export class MyScene extends CGFscene {
 
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight);
 
-    this.panorama = new MyPanorama(this, "textures/sky2.jpg");
+    this.panorama = new MyPanorama(this, "textures/sky.jpg");
 
     this.grassTexture = new CGFappearance(this);
     this.grassTexture.setAmbient(0.3, 0.3, 0.3, 1);
