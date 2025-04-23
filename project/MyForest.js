@@ -30,6 +30,7 @@ export class MyForest extends CGFobject {
                 const zOffset = (Math.random() - 0.5) * (areaHeight / rows) * 0.5; 
                 this.trees.push({
                     tree: tree,
+                    inclination: inclination,
                     x: (j * areaWidth) / cols - areaWidth / 2 + xOffset,
                     z: (i * areaHeight) / rows - areaHeight / 2 + zOffset,
                 });
@@ -40,7 +41,7 @@ export class MyForest extends CGFobject {
     display() {
         for (const treeData of this.trees) {
             this.scene.pushMatrix();
-            this.scene.translate(treeData.x, 0, treeData.z);
+            this.scene.translate(treeData.x, -Math.sin(treeData.inclination * (Math.PI / 180)), treeData.z);
             treeData.tree.display();
             this.scene.popMatrix();
         }
