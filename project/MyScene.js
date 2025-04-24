@@ -67,6 +67,16 @@ export class MyScene extends CGFscene {
     this.grassTexture.setShininess(10.0);
     this.grassTexture.loadTexture("textures/grass.jpg");
     this.grassTexture.setTextureWrap("REPEAT", "REPEAT");
+
+    this.lakeTexture = new CGFappearance(this);
+    this.lakeTexture.setAmbient(0.2, 0.2, 0.5, 1);
+    this.lakeTexture.setDiffuse(0.4, 0.4, 0.8, 1);
+    this.lakeTexture.setSpecular(0.8, 0.8, 1.0, 1);
+    this.lakeTexture.setShininess(50.0);
+    this.lakeTexture.loadTexture("textures/waterTex.jpg");
+    this.lakeTexture.setTextureWrap("REPEAT", "REPEAT");
+
+    this.lake = new MyPlane(this, 32, 0, 10, 0, 10);
   }
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
@@ -164,6 +174,14 @@ export class MyScene extends CGFscene {
     this.scale(0.6,0.6,0.6)
     this.translate(0, 5, 0);
     this.helicopter.display();
+    this.popMatrix();
+
+    this.pushMatrix();
+    this.lakeTexture.apply();
+    this.translate(15, 0.01, -10);
+    this.scale(10, 1, 10);      
+    this.rotate(-Math.PI / 2, 1, 0, 0); 
+    this.lake.display();
     this.popMatrix();
     
   }

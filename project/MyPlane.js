@@ -25,7 +25,6 @@ export class MyPlane extends CGFobject {
 		this.initBuffers();
 	}
 	initBuffers() {
-		// Generate vertices, normals, and texCoords
 		this.vertices = [];
 		this.normals = [];
 		this.texCoords = [];
@@ -40,7 +39,6 @@ export class MyPlane extends CGFobject {
 			}
 			yCoord -= this.patchLength;
 		}
-		// Generating indices
 		this.indices = [];
 
 		var ind = 0;
