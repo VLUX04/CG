@@ -43,7 +43,7 @@ export class MyHeli extends CGFobject {
 
         this.body = new MySphere(scene, 16, 16); 
         this.rotorCenter = new MyCylinder(scene, 16, 16); 
-        this.tail = new MyTruncatedCone(scene, this.tailLength, this.tailRadius); 
+        this.tail = new MyTruncatedCone(scene, this.tailLength, this.tailRadius, false); 
         this.box = new MyBox(scene); 
         this.bucket = new MyCylinder(scene, 16, 16); 
 

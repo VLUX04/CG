@@ -33,7 +33,7 @@ export class MyTree extends CGFobject {
         this.canopyMaterial.loadTexture(canopyTexture);
         this.canopyMaterial.setTextureWrap("REPEAT", "REPEAT");
 
-        this.trunk = new MyTruncatedCone(scene, this.trunkHeight, trunkRadius);
+        this.trunk = new MyTruncatedCone(scene, this.trunkHeight, trunkRadius, true);
         this.canopy = new MyPyramid(scene, 7, 1); 
     }
 
