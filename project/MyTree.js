@@ -10,7 +10,6 @@ export class MyTree extends CGFobject {
         this.rotationAxis = rotationAxis; 
         this.trunkRadius = trunkRadius; 
         this.treeHeight = treeHeight;
-        this.canopyColor = canopyColor; 
 
         this.trunkHeight = 0.2 * this.treeHeight; 
         this.canopyHeight = 0.8 * this.treeHeight * 2;
@@ -22,7 +21,7 @@ export class MyTree extends CGFobject {
         this.trunkMaterial.setDiffuse(0.6, 0.3, 0.15, 1);
         this.trunkMaterial.setSpecular(0.1, 0.05, 0.025, 1);
         this.trunkMaterial.setShininess(10.0);
-        this.trunkMaterial.loadTexture(trunkTexture);
+        this.trunkMaterial.setTexture(trunkTexture);
         this.trunkMaterial.setTextureWrap("REPEAT", "REPEAT");
 
         this.canopyMaterial = new CGFappearance(scene);
@@ -30,7 +29,7 @@ export class MyTree extends CGFobject {
         this.canopyMaterial.setDiffuse(canopyColor[0], canopyColor[1], canopyColor[2], 1);
         this.canopyMaterial.setSpecular(0.1, 0.1, 0.1, 1);
         this.canopyMaterial.setShininess(10.0);
-        this.canopyMaterial.loadTexture(canopyTexture);
+        this.canopyMaterial.setTexture(canopyTexture);
         this.canopyMaterial.setTextureWrap("REPEAT", "REPEAT");
 
         this.trunk = new MyTruncatedCone(scene, this.trunkHeight, trunkRadius, true);

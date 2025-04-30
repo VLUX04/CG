@@ -1,4 +1,4 @@
-import { CGFscene, CGFcamera, CGFaxis, CGFappearance} from "../lib/CGF.js";
+import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture} from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
@@ -56,8 +56,6 @@ export class MyScene extends CGFscene {
     );
 
 
-    this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight);
-
     this.panorama = new MyPanorama(this, "textures/sky.jpg");
 
     this.grassTexture = new CGFappearance(this);
@@ -76,6 +74,11 @@ export class MyScene extends CGFscene {
     this.lakeTexture.loadTexture("textures/waterTex.jpg");
     this.lakeTexture.setTextureWrap("REPEAT", "REPEAT");
 
+    this.trunkTexture = new CGFtexture(this, "textures/trunk.jpg");
+    this.canopyTexture = new CGFtexture(this, "textures/tree_crown.jpg");
+
+    this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
+    
     this.lake = new MyPlane(this, 32, 0, 10, 0, 10);
   }
   initLights() {
@@ -146,7 +149,7 @@ export class MyScene extends CGFscene {
     );
   }
   updateForest() {
-    this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight);
+    this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
   }
 
   setDefaultAppearance() {
