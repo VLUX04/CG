@@ -28,8 +28,8 @@ export class MyInterface extends CGFinterface {
         const forestFolder = this.gui.addFolder("Forest Controls");
         forestFolder.add(this.scene, "forestRows", 1, 10, 1).name("Rows").onChange(() => this.scene.updateForest());
         forestFolder.add(this.scene, "forestCols", 1, 10, 1).name("Columns").onChange(() => this.scene.updateForest());
-        forestFolder.add(this.scene, "forestWidth", 20, 25, 1).name("Width").onChange(() => this.scene.updateForest());
-        forestFolder.add(this.scene, "forestHeight", 20, 25, 1).name("Height").onChange(() => this.scene.updateForest());
+        forestFolder.add(this.scene, "forestWidth", 20, 50, 1).name("Width").onChange(() => this.scene.updateForest());
+        forestFolder.add(this.scene, "forestHeight", 20, 50, 1).name("Height").onChange(() => this.scene.updateForest());
 
 
         return true;

@@ -7,7 +7,7 @@ export class MyTruncatedCone extends CGFobject {
         this.baseRadius = baseRadius;
         this.isTrunk = isTrunk;
         this.topRadius = baseRadius * 0.75; 
-        this.slices = 20; 
+        this.slices = 10; 
         this.initBuffers();
     }
 
