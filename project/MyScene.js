@@ -1,4 +1,4 @@
-  import { CGFscene, CGFcamera, CGFaxis, CGFappearance} from "../lib/CGF.js";
+import { CGFscene, CGFcamera, CGFaxis, CGFappearance} from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
@@ -94,26 +94,46 @@ export class MyScene extends CGFscene {
     );
   }
   checkKeys() {
-    var text = "Keys pressed: ";
-    var keysPressed = false;
+    const h = this.helicopter;
+    let moved = false;
 
-    // Check for key codes e.g. in https://keycode.info/
     if (this.gui.isKeyPressed("KeyW")) {
-      text += " W ";
-      keysPressed = true;
+        h.x += h.speed * Math.sin(h.orientation);
+        h.z += h.speed * Math.cos(h.orientation);
+        moved = true;
+    }
+    if (this.gui.isKeyPressed("KeyS")) {
+        h.x -= h.speed * Math.sin(h.orientation);
+        h.z -= h.speed * Math.cos(h.orientation);
+        moved = true;
+    }
+    if (this.gui.isKeyPressed("KeyA")) {
+        h.orientation += 0.05;
+        moved = true;
+    }
+    if (this.gui.isKeyPressed("KeyD")) {
+        h.orientation -= 0.05;
+        moved = true;
+    }
+    if (this.gui.isKeyPressed("KeyQ")) {
+        h.y += h.speed;
+        moved = true;
+    }
+    if (this.gui.isKeyPressed("KeyE")) {
+        h.y -= h.speed;
+        moved = true;
     }
 
-    if (this.gui.isKeyPressed("KeyS")) {
-      text += " S ";
-      keysPressed = true;
-    }
-    if (keysPressed)
-      console.log(text);
+    if (moved)
+        console.log(`Heli: (${h.x.toFixed(2)}, ${h.y.toFixed(2)}, ${h.z.toFixed(2)}) angle: ${h.orientation.toFixed(2)}`);
   }
+
 
   update(t) {
     this.checkKeys();
+    this.helicopter.update(t);
   }
+  
   updateBuilding() {
     this.building = new MyBuilding(
         this,
