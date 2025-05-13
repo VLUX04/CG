@@ -1,12 +1,9 @@
 # CG 2024/2025
 
-## Group T0xG0y
+## Group T04G09
 
 ## TP 1 Notes
 
-(add your main observations/remarks about your experiments here, in a bulleted list, and remove this line. Some examples below)
+![Screenshot 1](screenshots/cgra-t04g09-tp1-1.png)
 
-- In exercise 1 we observed X
-- In exercise 2 we had difficulties in Y
-
-![Screenshot 1](screenshots/cg-t0xgxx-tp1-n.png)
+![Screenshot 2](screenshots/cgra-t04g09-tp1-2.png)
