@@ -4,6 +4,8 @@
 
 ## TP 3 Notes
 
+- We had no difficulties in these exercises.
+
 ![Screenshot 1](screenshots/cg-t04g09-tp3-1.png)
 
 ![Screenshot 2](screenshots/cg-t04g09-tp3-2.png)

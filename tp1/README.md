@@ -4,6 +4,8 @@
 
 ## TP 1 Notes
 
-![Screenshot 1](screenshots/cgra-t04g09-tp1-1.png)
+- We had no difficulties in these exercises.
 
-![Screenshot 2](screenshots/cgra-t04g09-tp1-2.png)
+![Screenshot 1](screenshots/cg-t04g09-tp1-1.png)
+
+![Screenshot 2](screenshots/cg-t04g09-tp1-2.png)
