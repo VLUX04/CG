@@ -15,6 +15,7 @@ export class MyHeli extends CGFobject {
         this.rotorRadius = 4;
         this.bucketRadius = 0.5;
         this.bucketHeight = 1;
+        this.line = false;
 
         this.mainRotorAngle = 0;
         this.tailRotorAngle = 0;
@@ -24,11 +25,14 @@ export class MyHeli extends CGFobject {
         this.z = 0;
         this.orientation = 0;
         this.speed = 0.5;
+        this.inclination = 0;
+
+        this.isAtRest = true;
 
         this.bodyMaterial = new CGFappearance(scene);
-        this.bodyMaterial.setAmbient(0.3, 0.3, 0.3, 1);
-        this.bodyMaterial.setDiffuse(0.7, 0.7, 0.7, 1);
-        this.bodyMaterial.setSpecular(0.1, 0.1, 0.1, 1);
+        this.bodyMaterial.setAmbient(0.5, 0.1, 0.1, 1);  
+        this.bodyMaterial.setDiffuse(0.9, 0.1, 0.1, 1);   
+        this.bodyMaterial.setSpecular(0.3, 0.1, 0.1, 1); 
         this.bodyMaterial.setShininess(10.0);
 
         this.glass = new CGFappearance(scene);
@@ -53,7 +57,7 @@ export class MyHeli extends CGFobject {
         this.rotorCenter = new MyCylinder(scene, 16, 16);
         this.tail = new MyTruncatedCone(scene, this.tailLength, this.tailRadius, false);
         this.box = new MyBox(scene);
-        this.bucket = new MyCylinder(scene, 16, 16);
+        this.bucket = new MyTruncatedCone(scene, this.bucketHeight, this.bucketRadius, false);
 
         this.initBuffers();
     }
@@ -66,37 +70,12 @@ export class MyHeli extends CGFobject {
         this.tailRotorAngle %= 2 * Math.PI;
     }
 
-    moveForward() {
-        this.x += this.speed * Math.sin(this.orientation);
-        this.z += this.speed * Math.cos(this.orientation);
-    }
-
-    moveBackward() {
-        this.x -= this.speed * Math.sin(this.orientation);
-        this.z -= this.speed * Math.cos(this.orientation);
-    }
-
-    turnLeft() {
-        this.orientation += 0.05;
-    }
-
-    turnRight() {
-        this.orientation -= 0.05;
-    }
-
-    ascend() {
-        this.y += this.speed;
-    }
-
-    descend() {
-        this.y -= this.speed;
-    }
-
     display() {
         this.scene.pushMatrix();
 
         this.scene.translate(this.x, this.y, this.z);
         this.scene.rotate(this.orientation, 0, 1, 0);
+        this.scene.rotate(this.inclination, 1, 0, 0);
 
         // Main body
         this.scene.pushMatrix();
@@ -144,6 +123,26 @@ export class MyHeli extends CGFobject {
         this.scene.rotate(-Math.PI / 2, 0, 0, 1);
         this.makeRotor();
         this.scene.popMatrix();
+
+        // Bucket
+        this.scene.pushMatrix();
+        this.bucketMaterial.apply();
+        this.scene.translate(0, this.line ? -5 : -0.5 , 0);
+        this.scene.rotate(Math.PI , 1, 0, 0);
+        this.scene.scale(2, 1.5, 2);
+        this.bucket.display();
+        this.scene.popMatrix();
+
+        if (this.line) {
+            this.scene.pushMatrix();
+            this.rotorMaterial.apply();
+            this.scene.translate(0, -2.5, 0);
+            this.scene.rotate(Math.PI / 2, 1, 0, 0);
+            this.scene.scale(0.1, 0.1, 5);
+            this.box.display();
+            this.scene.popMatrix();
+        }
+
 
         this.makeLandingGear();
 

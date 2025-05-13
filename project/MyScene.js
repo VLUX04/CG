@@ -21,6 +21,9 @@ export class MyScene extends CGFscene {
     this.forestCols = 4;
     this.forestWidth = 20; 
     this.forestHeight = 20;
+
+    this.heliLifting = false;
+    this.heliGoingHome = false;
   }
   init(application) {
     super.init(application);
@@ -47,10 +50,10 @@ export class MyScene extends CGFscene {
 
     this.building = new MyBuilding(
       this,
-      this.centralWidth,
-      this.sideWidthPerc,
-      this.numFloors,
-      this.numWindows,
+      5,
+      0.75, 
+      3,
+      2,
       "textures/window.jpg",
       [1, 1, 1]
     );
@@ -92,62 +95,143 @@ export class MyScene extends CGFscene {
       1,
       0.1,
       1000,
-      vec3.fromValues(15, 3, 0),
-      vec3.fromValues(0, 0, 0)
+      vec3.fromValues(15, 15, 15),
+      vec3.fromValues(0, 0, -10)
     );
   }
   checkKeys() {
     const h = this.helicopter;
     let moved = false;
 
-    if (this.gui.isKeyPressed("KeyW")) {
+    if (this.gui.isKeyPressed("KeyW") && !h.isAtRest) {
         h.x += h.speed * Math.sin(h.orientation);
         h.z += h.speed * Math.cos(h.orientation);
+        h.inclination = 0.1;
         moved = true;
     }
-    if (this.gui.isKeyPressed("KeyS")) {
+    if (this.gui.isKeyPressed("KeyS") && !h.isAtRest) {
         h.x -= h.speed * Math.sin(h.orientation);
         h.z -= h.speed * Math.cos(h.orientation);
+        h.inclination = -0.1;
+
         moved = true;
     }
-    if (this.gui.isKeyPressed("KeyA")) {
+    if (this.gui.isKeyPressed("KeyA") && !h.isAtRest) {
         h.orientation += 0.05;
         moved = true;
     }
-    if (this.gui.isKeyPressed("KeyD")) {
+    if (this.gui.isKeyPressed("KeyD") && !h.isAtRest) {
         h.orientation -= 0.05;
         moved = true;
     }
-    if (this.gui.isKeyPressed("KeyQ")) {
-        h.y += h.speed;
+    if (this.gui.isKeyPressed("KeyP")) {
+        this.heliLifting = true;
         moved = true;
     }
-    if (this.gui.isKeyPressed("KeyE")) {
-        h.y -= h.speed;
-        moved = true;
+    if (this.gui.isKeyPressed("KeyL") && !h.isAtRest) {
+        this.heliGoingHome = true;
+    }
+    if (this.gui.isKeyPressed("KeyR")) {
+        h.y = 0;
+        h.x = 0;
+        h.z = 0;
+        h.orientation = 0;
+        h.isAtRest = true;
+        this.heliLifting = false;
     }
 
     if (moved)
+        h.isAtRest = false;
+    else 
+        h.inclination = 0;
         console.log(`Heli: (${h.x.toFixed(2)}, ${h.y.toFixed(2)}, ${h.z.toFixed(2)}) angle: ${h.orientation.toFixed(2)}`);
+
   }
 
 
   update(t) {
     this.checkKeys();
-    this.helicopter.update(t);
+    if (!this.helicopter.isAtRest) {
+        this.helicopter.update(t);
+    }
+
+    if (this.heliLifting) {
+        if (this.helicopter.y < 25) {
+            this.helicopter.y += this.helicopter.speed;
+        } else {
+            this.heliLifting = false;
+        }
+    }
+
+    this.helicopter.line = !this.helicopter.isAtRest && !this.heliLifting;
+
+
+
+  if (this.heliGoingHome) {
+      const heli = this.helicopter;
+      const tolerance = 0.3; 
+      const orientationTolerance = 0.1; 
+
+      let validOrientations = [];
+
+      if (Math.abs(heli.x) > tolerance) {
+          validOrientations = heli.x > 0 ? [-1.60, 4.70] : [1.60, -4.70];
+      } else if (Math.abs(heli.z) > tolerance) {
+          validOrientations = heli.z > 0 ? [-3.15, 3.15] : [0, 0];
+      } else if (Math.abs(heli.x) <= tolerance && Math.abs(heli.z) <= tolerance) {
+          validOrientations = [0];
+      }
+
+      const closestOrientation = this.getClosestOrientation(heli.orientation, validOrientations);
+      if (Math.abs(heli.orientation - closestOrientation) > orientationTolerance) {
+          heli.orientation += heli.orientation < closestOrientation ? 0.05 : -0.05;
+      } else {
+          if (Math.abs(heli.x) > tolerance) {
+              heli.x += heli.x > 0 ? -heli.speed : heli.speed;
+              heli.inclination = 0.1;
+          } else if (Math.abs(heli.z) > tolerance) {
+              heli.z += heli.z > 0 ? -heli.speed : heli.speed;
+              heli.inclination = 0.1;
+          } else if (heli.y > 0) {
+              heli.y -= heli.speed;
+              heli.line = false;
+          } else {
+              heli.isAtRest = true;
+              this.heliGoingHome = false; 
+          }
+      }
+  }
+    const minCameraHeight = 1;
+    if (this.camera.position[1] < minCameraHeight) {
+        this.camera.position[1] = minCameraHeight;
+    }
+    const planeSize = 200; 
+    this.camera.position[0] = Math.max(-planeSize, Math.min(planeSize, this.camera.position[0])); // X-axis
+    this.camera.position[2] = Math.max(-planeSize, Math.min(planeSize, this.camera.position[2])); // Z-axis
+  }
+
+  getClosestOrientation(currentOrientation, validOrientations) {
+      const normalizeAngle = (angle) => {
+          return ((angle + Math.PI) % (2 * Math.PI)) - Math.PI;
+      };
+
+      const normalizedCurrent = normalizeAngle(currentOrientation);
+
+      let closest = validOrientations[0];
+      let minDifference = Math.abs(normalizedCurrent - normalizeAngle(closest));
+
+      for (const orientation of validOrientations) {
+          const normalizedOrientation = normalizeAngle(orientation);
+          const difference = Math.abs(normalizedCurrent - normalizedOrientation);
+          if (difference < minDifference) {
+              closest = orientation;
+              minDifference = difference;
+          }
+      }
+
+      return closest;
   }
   
-  updateBuilding() {
-    this.building = new MyBuilding(
-        this,
-        this.centralWidth,
-        this.sideWidthPerc,
-        this.numFloors,
-        this.numWindows,
-        "textures/window.jpg",
-        [1, 1, 1]
-    );
-  }
   updateForest() {
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
   }
@@ -180,7 +264,9 @@ export class MyScene extends CGFscene {
     this.plane.display();
     this.popMatrix();
 
+    this.pushMatrix();
     this.panorama.display(this.camera.position);
+    this.popMatrix();
 
     this.pushMatrix();
     this.scale(2, 2, 2); 
@@ -195,7 +281,7 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
     this.scale(0.6,0.6,0.6)
-    this.translate(0, 5, 0);
+    this.translate(0, 16.6, -65);
     this.helicopter.display();
     this.popMatrix();
 
