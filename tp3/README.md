@@ -2,7 +2,7 @@
 
 ## Group T04G09
 
-## TP 2 Notes
+## TP 3 Notes
 
 ![Screenshot 1](screenshots/cgra-t04g09-tp3-1.png)
 
