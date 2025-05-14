@@ -1,4 +1,4 @@
-import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture} from "../lib/CGF.js";
+import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture, CGFshader} from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
@@ -24,6 +24,15 @@ export class MyScene extends CGFscene {
 
     this.heliLifting = false;
     this.heliGoingHome = false;
+
+    this.texture = null;
+    this.appearance = null;
+
+    // initial configuration of interface
+    this.selectedObject = 0;
+    this.wireframe = false;
+    this.selectedExampleShader = 0;
+    this.showShaderCode = false;
   }
   init(application) {
     super.init(application);
@@ -58,7 +67,6 @@ export class MyScene extends CGFscene {
       [1, 1, 1]
     );
 
-
     this.panorama = new MyPanorama(this, "textures/sky.jpg");
 
     this.grassTexture = new CGFappearance(this);
@@ -69,27 +77,42 @@ export class MyScene extends CGFscene {
     this.grassTexture.loadTexture("textures/grass.jpg");
     this.grassTexture.setTextureWrap("REPEAT", "REPEAT");
 
-    this.lakeTexture = new CGFappearance(this);
-    this.lakeTexture.setAmbient(0.2, 0.2, 0.5, 1);
-    this.lakeTexture.setDiffuse(0.4, 0.4, 0.8, 1);
-    this.lakeTexture.setSpecular(0.8, 0.8, 1.0, 1);
-    this.lakeTexture.setShininess(50.0);
-    this.lakeTexture.loadTexture("textures/waterTex.jpg");
-    this.lakeTexture.setTextureWrap("REPEAT", "REPEAT");
-
     this.trunkTexture = new CGFtexture(this, "textures/trunk.jpg");
     this.canopyTexture = new CGFtexture(this, "textures/tree_crown.jpg");
 
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
     
     this.lake = new MyPlane(this, 32, 0, 10, 0, 10);
+
+    this.lakeAppearance = new CGFappearance(this);
+    this.lakeAppearance.setAmbient(0.3, 0.3, 0.3, 1);
+    this.lakeAppearance.setDiffuse(0.7, 0.7, 0.7, 1);
+    this.lakeAppearance.setSpecular(0.0, 0.0, 0.0, 1);
+    this.lakeAppearance.setShininess(120);
+    this.lakeTexture = new CGFtexture(this, "textures/waterTex.jpg");
+    this.lakeAppearance.setTexture(this.texture);
+    this.lakeAppearance.setTextureWrap("REPEAT", "REPEAT");
+    this.lakeTexture2 = new CGFtexture(this, "textures/waterMap.jpg");
+
+    // shaders initialization
+    this.testShaders = [
+        new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
+    ];
+
+    this.shadersDiv = document.getElementById("shaders");
+    this.fShaderDiv = document.getElementById("fshader");
+
+    // set the scene update period 
+    this.setUpdatePeriod(50);
   }
+
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[0].enable();
     this.lights[0].update();
   }
+
   initCameras() {
     this.camera = new CGFcamera(
       1,
@@ -113,7 +136,6 @@ export class MyScene extends CGFscene {
         h.x -= h.speed * Math.sin(h.orientation);
         h.z -= h.speed * Math.cos(h.orientation);
         h.inclination = -0.1;
-
         moved = true;
     }
     if (this.gui.isKeyPressed("KeyA") && !h.isAtRest) {
@@ -145,11 +167,10 @@ export class MyScene extends CGFscene {
     else 
         h.inclination = 0;
         console.log(`Heli: (${h.x.toFixed(2)}, ${h.y.toFixed(2)}, ${h.z.toFixed(2)}) angle: ${h.orientation.toFixed(2)}`);
-
   }
 
-
   update(t) {
+    this.testShaders[0].setUniformsValues({ timeFactor: t / 100 % 100 });
     this.checkKeys();
     if (!this.helicopter.isAtRest) {
         this.helicopter.update(t);
@@ -165,9 +186,7 @@ export class MyScene extends CGFscene {
 
     this.helicopter.line = !this.helicopter.isAtRest && !this.heliLifting;
 
-
-
-  if (this.heliGoingHome) {
+    if (this.heliGoingHome) {
       const heli = this.helicopter;
       const tolerance = 0.3; 
       const orientationTolerance = 0.1; 
@@ -200,7 +219,7 @@ export class MyScene extends CGFscene {
               this.heliGoingHome = false; 
           }
       }
-  }
+    }
     const minCameraHeight = 1;
     if (this.camera.position[1] < minCameraHeight) {
         this.camera.position[1] = minCameraHeight;
@@ -242,18 +261,14 @@ export class MyScene extends CGFscene {
     this.setSpecular(0.5, 0.5, 0.5, 1.0);
     this.setShininess(10.0);
   }
+
   display() {
     // ---- BEGIN Background, camera and axis setup
-    // Clear image and depth buffer everytime we update the scene
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    // Initialize Model-View matrix as identity (no transformation
     this.updateProjectionMatrix();
     this.loadIdentity();
-    // Apply transformations corresponding to the camera position relative to the origin
     this.applyViewMatrix();
-
-    // Draw axis
 
     this.setDefaultAppearance();
 
@@ -285,13 +300,28 @@ export class MyScene extends CGFscene {
     this.helicopter.display();
     this.popMatrix();
 
+    // ---- LAKE WITH SHADER ----
+    this.lakeAppearance.apply();
+    this.setActiveShader(this.testShaders[0]);
+
+    // Set texture unit uniforms for the shader
+    this.testShaders[0].setUniformsValues({
+        uSampler: 0,    // waterTex.jpg (fragment shader)
+        uSampler2: 1,   // waterMap.jpg (fragment shader)
+        waterMap: 1     // waterMap.jpg (vertex shader)
+    });
+
+    // Bind textures to the correct units
+    this.lakeTexture.bind(0);   // waterTex.jpg (base color)
+    this.lakeTexture2.bind(1);  // waterMap.jpg (displacement/filter)
+
     this.pushMatrix();
-    this.lakeTexture.apply();
-    this.translate(15, 0.01, -10);
-    this.scale(10, 1, 10);      
+    this.translate(25, 0.001, 0);
     this.rotate(-Math.PI / 2, 1, 0, 0); 
+    this.scale(30, 30, 0.5);      
     this.lake.display();
     this.popMatrix();
-    
+
+    this.setActiveShader(this.defaultShader); // Reset to default after drawing the lake
   }
 }
