@@ -19,6 +19,9 @@ export class MyInterface extends CGFinterface {
 
         this.initKeys();
 
+        const heliFolder = this.gui.addFolder("Helicopter Controls");
+        heliFolder.add(this.scene, "speedFactor", 0.1, 3).name("Speed Factor");
+
         const forestFolder = this.gui.addFolder("Forest Controls");
         forestFolder.add(this.scene, "forestRows", 1, 10, 1).name("Rows").onChange(() => this.scene.updateForest());
         forestFolder.add(this.scene, "forestCols", 1, 10, 1).name("Columns").onChange(() => this.scene.updateForest());

@@ -28,6 +28,7 @@ export class MyHeli extends CGFobject {
         this.inclination = 0;
 
         this.isAtRest = true;
+        this.hasWater = false;
 
         this.bodyMaterial = new CGFappearance(scene);
         this.bodyMaterial.setAmbient(0.5, 0.1, 0.1, 1);  
@@ -48,9 +49,9 @@ export class MyHeli extends CGFobject {
         this.rotorMaterial.setShininess(50.0);
 
         this.bucketMaterial = new CGFappearance(scene);
-        this.bucketMaterial.setAmbient(0.1, 0.1, 0.8, 1);
-        this.bucketMaterial.setDiffuse(0.3, 0.3, 1, 1);
-        this.bucketMaterial.setSpecular(0.5, 0.5, 1, 1);
+        this.bucketMaterial.setAmbient(0.1, 0.1, 0.1, 1);
+        this.bucketMaterial.setDiffuse(0.4, 0.4, 0.4, 1);
+        this.bucketMaterial.setSpecular(0.4, 0.4, 0.4, 1);
         this.bucketMaterial.setShininess(50.0);
 
         this.body = new MySphere(scene, 16, 16);
@@ -63,8 +64,20 @@ export class MyHeli extends CGFobject {
     }
 
     update(t) {
-        this.mainRotorAngle += 0.3;
-        this.tailRotorAngle += 0.4;
+        
+        if (this.hasWater) {
+            this.bucketMaterial.setAmbient(0.1, 0.1, 0.5, 1);
+            this.bucketMaterial.setDiffuse(0.3, 0.3, 0.9, 1);
+            this.bucketMaterial.setSpecular(0.5, 0.5, 1.0, 1);
+        }
+        else{
+            this.bucketMaterial.setAmbient(0.1, 0.1, 0.1, 1);
+            this.bucketMaterial.setDiffuse(0.4, 0.4, 0.4, 1);
+            this.bucketMaterial.setSpecular(0.4, 0.4, 0.4, 1);
+        }
+
+        this.mainRotorAngle += 0.3 * this.scene.speedFactor; 
+        this.tailRotorAngle += 0.4 * this.scene.speedFactor;
 
         this.mainRotorAngle %= 2 * Math.PI;
         this.tailRotorAngle %= 2 * Math.PI;
