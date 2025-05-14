@@ -28,11 +28,6 @@ export class MyScene extends CGFscene {
     this.texture = null;
     this.appearance = null;
 
-    // initial configuration of interface
-    this.selectedObject = 0;
-    this.wireframe = false;
-    this.selectedExampleShader = 0;
-    this.showShaderCode = false;
   }
   init(application) {
     super.init(application);
@@ -94,15 +89,10 @@ export class MyScene extends CGFscene {
     this.lakeAppearance.setTextureWrap("REPEAT", "REPEAT");
     this.lakeTexture2 = new CGFtexture(this, "textures/waterMap.jpg");
 
-    // shaders initialization
     this.testShaders = [
         new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
     ];
 
-    this.shadersDiv = document.getElementById("shaders");
-    this.fShaderDiv = document.getElementById("fshader");
-
-    // set the scene update period 
     this.setUpdatePeriod(50);
   }
 
@@ -300,20 +290,17 @@ export class MyScene extends CGFscene {
     this.helicopter.display();
     this.popMatrix();
 
-    // ---- LAKE WITH SHADER ----
     this.lakeAppearance.apply();
     this.setActiveShader(this.testShaders[0]);
 
-    // Set texture unit uniforms for the shader
     this.testShaders[0].setUniformsValues({
         uSampler: 0,    // waterTex.jpg (fragment shader)
         uSampler2: 1,   // waterMap.jpg (fragment shader)
         waterMap: 1     // waterMap.jpg (vertex shader)
     });
 
-    // Bind textures to the correct units
-    this.lakeTexture.bind(0);   // waterTex.jpg (base color)
-    this.lakeTexture2.bind(1);  // waterMap.jpg (displacement/filter)
+    this.lakeTexture.bind(0);   
+    this.lakeTexture2.bind(1);  
 
     this.pushMatrix();
     this.translate(25, 0.001, 0);
