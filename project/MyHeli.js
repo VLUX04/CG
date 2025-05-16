@@ -76,8 +76,8 @@ export class MyHeli extends CGFobject {
             this.bucketMaterial.setSpecular(0.4, 0.4, 0.4, 1);
         }
 
-        this.mainRotorAngle += 0.3 * this.scene.speedFactor; 
-        this.tailRotorAngle += 0.4 * this.scene.speedFactor;
+        this.mainRotorAngle += 0.3 ; 
+        this.tailRotorAngle += 0.4 ;
 
         this.mainRotorAngle %= 2 * Math.PI;
         this.tailRotorAngle %= 2 * Math.PI;

@@ -7,7 +7,7 @@ export class MyLake extends CGFobject {
   }
 
   initBuffers() {
-    const segments = 200;
+    const segments = 100;
     const baseRadius = 1;
 
     this.vertices = [];
@@ -42,11 +42,11 @@ export class MyLake extends CGFobject {
       this.texCoords.push(0.5 + x / 2, 0.5 + z / 2);
 
       if (i > 0) {
-        this.indices.push(0, i, i + 1);
+        this.indices.push(0, i + 1, i);
       }
     }
 
-    this.indices.push(0, segments + 1, 1);
+    this.indices.push(0, 1, segments + 1);
 
     this.primitiveType = this.scene.gl.TRIANGLES;
     this.initGLBuffers();
