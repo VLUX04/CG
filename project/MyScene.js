@@ -24,10 +24,12 @@ export class MyScene extends CGFscene {
 
     this.heliLifting = false;
     this.heliGoingHome = false;
+    this.heliGettingWater = false;
 
-    this.texture = null;
-    this.appearance = null;
+    this.speedFactor = 1;
 
+    this.lakePosition = { x: 25, z: 0 };
+    this.lakeSize = { width: 30, depth: 30 }; 
   }
   init(application) {
     super.init(application);
@@ -102,7 +104,6 @@ export class MyScene extends CGFscene {
     this.lights[0].enable();
     this.lights[0].update();
   }
-
   initCameras() {
     this.camera = new CGFcamera(
       1,
@@ -117,14 +118,14 @@ export class MyScene extends CGFscene {
     let moved = false;
 
     if (this.gui.isKeyPressed("KeyW") && !h.isAtRest) {
-        h.x += h.speed * Math.sin(h.orientation);
-        h.z += h.speed * Math.cos(h.orientation);
-        h.inclination = 0.1;
-        moved = true;
+      h.x += h.speed * this.speedFactor * Math.sin(h.orientation);
+      h.z += h.speed * this.speedFactor * Math.cos(h.orientation);
+      h.inclination = 0.1;
+      moved = true;
     }
     if (this.gui.isKeyPressed("KeyS") && !h.isAtRest) {
-        h.x -= h.speed * Math.sin(h.orientation);
-        h.z -= h.speed * Math.cos(h.orientation);
+        h.x -= h.speed * this.speedFactor * Math.sin(h.orientation);
+        h.z -= h.speed * this.speedFactor * Math.cos(h.orientation);
         h.inclination = -0.1;
         moved = true;
     }
@@ -141,7 +142,12 @@ export class MyScene extends CGFscene {
         moved = true;
     }
     if (this.gui.isKeyPressed("KeyL") && !h.isAtRest) {
-        this.heliGoingHome = true;
+        if (this.isHeliAboveLake() && !this.helicopter.hasWater) {
+            this.heliGettingWater = true;
+        }
+        else if (!this.helicopter.hasWater) {
+            this.heliGoingHome = true;
+        }
     }
     if (this.gui.isKeyPressed("KeyR")) {
         h.y = 0;
@@ -150,13 +156,20 @@ export class MyScene extends CGFscene {
         h.orientation = 0;
         h.isAtRest = true;
         this.heliLifting = false;
+        h.hasWater = false;
+        this.heliGoingHome = false;
+        this.heliGettingWater = false;
     }
 
     if (moved)
         h.isAtRest = false;
-    else 
+    else {
         h.inclination = 0;
         console.log(`Heli: (${h.x.toFixed(2)}, ${h.y.toFixed(2)}, ${h.z.toFixed(2)}) angle: ${h.orientation.toFixed(2)}`);
+    }
+}
+  normalizeAngle(angle) {
+    return ((angle + Math.PI) % (2 * Math.PI)) - Math.PI;
   }
 
   update(t) {
@@ -174,43 +187,56 @@ export class MyScene extends CGFscene {
         }
     }
 
-    this.helicopter.line = !this.helicopter.isAtRest && !this.heliLifting;
+    this.helicopter.line = !this.helicopter.isAtRest && !this.heliLifting || ( this.helicopter.hasWater && this.heliLifting) ;
+
+
 
     if (this.heliGoingHome) {
       const heli = this.helicopter;
-      const tolerance = 0.3; 
-      const orientationTolerance = 0.1; 
+      const tolerance = 0.3;
+      const orientationTolerance = 0.05;
 
-      let validOrientations = [];
+      const dx = -heli.x;
+      const dz = -heli.z;
+      const distance = Math.sqrt(dx * dx + dz * dz);
 
-      if (Math.abs(heli.x) > tolerance) {
-          validOrientations = heli.x > 0 ? [-1.60, 4.70] : [1.60, -4.70];
-      } else if (Math.abs(heli.z) > tolerance) {
-          validOrientations = heli.z > 0 ? [-3.15, 3.15] : [0, 0];
-      } else if (Math.abs(heli.x) <= tolerance && Math.abs(heli.z) <= tolerance) {
-          validOrientations = [0];
+      if (distance > tolerance) {
+          const targetOrientation = Math.atan2(dx, dz);
+          const orientationDiff = this.normalizeAngle(targetOrientation - heli.orientation);
+
+          if (Math.abs(orientationDiff) > orientationTolerance) {
+              heli.orientation += orientationDiff > 0 ? 0.05 : -0.05;
+          } else {
+              heli.x += (dx / distance) * heli.speed;
+              heli.z += (dz / distance) * heli.speed;
+              heli.inclination = 0.1;
+          }
       }
-
-      const closestOrientation = this.getClosestOrientation(heli.orientation, validOrientations);
-      if (Math.abs(heli.orientation - closestOrientation) > orientationTolerance) {
-          heli.orientation += heli.orientation < closestOrientation ? 0.05 : -0.05;
-      } else {
-          if (Math.abs(heli.x) > tolerance) {
-              heli.x += heli.x > 0 ? -heli.speed : heli.speed;
-              heli.inclination = 0.1;
-          } else if (Math.abs(heli.z) > tolerance) {
-              heli.z += heli.z > 0 ? -heli.speed : heli.speed;
-              heli.inclination = 0.1;
+      else {
+          const rotationDiff = this.normalizeAngle(0 - heli.orientation);
+          if (Math.abs(rotationDiff) > orientationTolerance) {
+              heli.orientation += rotationDiff > 0 ? 0.05 : -0.05;
           } else if (heli.y > 0) {
               heli.y -= heli.speed;
               heli.line = false;
           } else {
               heli.isAtRest = true;
-              this.heliGoingHome = false; 
+              this.heliGoingHome = false;
           }
       }
     }
-    const minCameraHeight = 1;
+    if (this.heliGettingWater) {
+        if (this.helicopter.y > - 13) {
+          this.helicopter.y -= this.helicopter.speed;
+        }
+        else {
+          this.helicopter.hasWater = true;
+          this.heliGettingWater = false;
+        }
+    }
+
+
+    const minCameraHeight = 2;
     if (this.camera.position[1] < minCameraHeight) {
         this.camera.position[1] = minCameraHeight;
     }
@@ -219,27 +245,47 @@ export class MyScene extends CGFscene {
     this.camera.position[2] = Math.max(-planeSize, Math.min(planeSize, this.camera.position[2])); // Z-axis
   }
 
-  getClosestOrientation(currentOrientation, validOrientations) {
-      const normalizeAngle = (angle) => {
-          return ((angle + Math.PI) % (2 * Math.PI)) - Math.PI;
-      };
 
-      const normalizedCurrent = normalizeAngle(currentOrientation);
+  getClosestOrientation(currentOrientation, validOrientation) {
+    let closest = validOrientation;
+    const normalizeAngle = (angle) => {
+        return ((angle + Math.PI) % (2 * Math.PI)) - Math.PI;
+    };
 
-      let closest = validOrientations[0];
-      let minDifference = Math.abs(normalizedCurrent - normalizeAngle(closest));
+    const normalizedCurrent = normalizeAngle(currentOrientation);
+    let minDifference = Math.abs(normalizeAngle(normalizedCurrent - validOrientation));
 
-      for (const orientation of validOrientations) {
-          const normalizedOrientation = normalizeAngle(orientation);
-          const difference = Math.abs(normalizedCurrent - normalizedOrientation);
-          if (difference < minDifference) {
-              closest = orientation;
-              minDifference = difference;
-          }
-      }
+    const normalizedOrientation = normalizeAngle(validOrientation);
+    const difference = Math.abs(normalizeAngle(normalizedCurrent - normalizedOrientation));
+    if (difference < minDifference) {
+        closest = validOrientation;
+        minDifference = difference;
+    }
 
-      return closest;
+    return closest;
   }
+
+  isHeliAboveLake() {
+        const heli = this.helicopter;
+        const lake = this.lakePosition;
+        const size = this.lakeSize;
+
+        const lakeXMin = lake.x - size.width / 2;
+        const lakeXMax = lake.x + size.width / 2;
+        const lakeZMin = lake.z - size.depth / 2;
+        const lakeZMax = lake.z + size.depth / 2;
+
+        console.log(`Heli Position: (${heli.x}, ${heli.y}, ${heli.z - 39})`);
+        console.log(`Lake Position: (${lake.x}, ${lake.z})`);
+        console.log(`Lake Bounds: X(${lakeXMin}, ${lakeXMax}), Z(${lakeZMin}, ${lakeZMax})`);
+
+        return (
+            heli.x >= lakeXMin &&
+            heli.x <= lakeXMax &&
+            heli.z - 39 >= lakeZMin &&
+            heli.z - 39 <= lakeZMax
+        );
+    }
   
   updateForest() {
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
@@ -251,7 +297,6 @@ export class MyScene extends CGFscene {
     this.setSpecular(0.5, 0.5, 0.5, 1.0);
     this.setShininess(10.0);
   }
-
   display() {
     // ---- BEGIN Background, camera and axis setup
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
@@ -285,8 +330,8 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
     this.pushMatrix();
+    this.translate(0, 10, -39);
     this.scale(0.6,0.6,0.6)
-    this.translate(0, 16.6, -65);
     this.helicopter.display();
     this.popMatrix();
 
@@ -303,7 +348,7 @@ export class MyScene extends CGFscene {
     this.lakeTexture2.bind(1);  
 
     this.pushMatrix();
-    this.translate(25, 0.001, 0);
+    this.translate(25, 0.1, 0);
     this.rotate(-Math.PI / 2, 1, 0, 0); 
     this.scale(30, 30, 0.5);      
     this.lake.display();
