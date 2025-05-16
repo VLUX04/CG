@@ -4,6 +4,7 @@ import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
 import { MyForest } from "./MyForest.js";
 import { MyHeli } from "./MyHeli.js";
+import { MyLake } from "./MyLake.js";
 
 /**
  * MyScene
@@ -79,7 +80,7 @@ export class MyScene extends CGFscene {
 
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
     
-    this.lake = new MyPlane(this, 32, 0, 10, 0, 10);
+    this.lake = new MyLake(this);
 
     this.lakeAppearance = new CGFappearance(this);
     this.lakeAppearance.setAmbient(0.3, 0.3, 0.3, 1);
@@ -339,9 +340,9 @@ export class MyScene extends CGFscene {
     this.setActiveShader(this.testShaders[0]);
 
     this.testShaders[0].setUniformsValues({
-        uSampler: 0,    // waterTex.jpg (fragment shader)
-        uSampler2: 1,   // waterMap.jpg (fragment shader)
-        waterMap: 1     // waterMap.jpg (vertex shader)
+        uSampler: 0,    
+        uSampler2: 1,   
+        waterMap: 1    
     });
 
     this.lakeTexture.bind(0);   
@@ -349,11 +350,11 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
     this.translate(25, 0.1, 0);
-    this.rotate(-Math.PI / 2, 1, 0, 0); 
-    this.scale(30, 30, 0.5);      
+    this.rotate(-Math.PI, 1, 0, 0); 
+    this.scale(20, 1, 20);      
     this.lake.display();
     this.popMatrix();
 
-    this.setActiveShader(this.defaultShader); // Reset to default after drawing the lake
+    this.setActiveShader(this.defaultShader); 
   }
 }

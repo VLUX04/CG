@@ -1,43 +1,54 @@
-import { CGFobject, CGFappearance, CGFtexture, CGFshader } from "../lib/CGF.js";
-import { MyPlane } from "./MyPlane.js";
+import { CGFobject } from "../lib/CGF.js";
 
 export class MyLake extends CGFobject {
-    constructor(scene) {
-        super(scene);
+  constructor(scene) {
+    super(scene);
+    this.initBuffers();
+  }
 
-        this.waterTex = new CGFtexture(scene, "textures/waterTex.jpg");
-        this.waterMap = new CGFtexture(scene, "textures/waterMap.jpg");
+  initBuffers() {
+    const segments = 200;
+    const baseRadius = 1;
 
-        this.appearance = new CGFappearance(scene);
-        this.appearance.setAmbient(0.2, 0.2, 0.5, 1);
-        this.appearance.setDiffuse(0.4, 0.4, 0.8, 1);
-        this.appearance.setSpecular(0.8, 0.8, 1.0, 1);
-        this.appearance.setShininess(50.0);
-        this.appearance.setTexture(this.waterTex);
-        this.appearance.setTextureWrap("REPEAT", "REPEAT");
+    this.vertices = [];
+    this.indices = [];
+    this.normals = [];
+    this.texCoords = [];
 
-        this.shader = new CGFshader(scene.gl, "shaders/water.vert", "shaders/water.frag");
-        this.shader.setUniformsValues({ normScale: 1, timeFactor: 0, uSampler2: 1 });
-
-        this.plane = new MyPlane(scene, 32, 0, 10, 0, 10);
+    function noise(angle) {
+      return (
+        0.3 *
+        (Math.sin(3 * angle) +
+         0.5 * Math.sin(5.7 * angle + 1.2) +
+         0.3 * Math.cos(2.2 * angle - 0.7))
+      );
     }
 
-    display() {
-        // Bind the normal/displacement map to texture unit 1
-        this.waterMap.bind(1);
+    this.vertices.push(0, 0, 0);
+    this.normals.push(0, 1, 0);
+    this.texCoords.push(0.5, 0.5);
 
-        // Activate the shader
-        this.scene.setActiveShader(this.shader);
+    for (let i = 0; i <= segments; i++) {
+      const angle = (2 * Math.PI * i) / segments;
 
-        // Draw the plane
-        this.plane.display();
+      const distortion = noise(angle);
+      const radius = baseRadius + distortion;
 
-        // Restore default shader
-        this.scene.setActiveShader(this.scene.defaultShader);
+      const x = radius * Math.cos(angle);
+      const z = radius * Math.sin(angle);
+
+      this.vertices.push(x, 0, z);
+      this.normals.push(0, 1, 0);
+      this.texCoords.push(0.5 + x / 2, 0.5 + z / 2);
+
+      if (i > 0) {
+        this.indices.push(0, i, i + 1);
+      }
     }
 
-    update(t) {
-        // Animate the water by updating the timeFactor uniform
-        this.shader.setUniformsValues({ timeFactor: (t / 100) % 100 });
-    }
+    this.indices.push(0, segments + 1, 1);
+
+    this.primitiveType = this.scene.gl.TRIANGLES;
+    this.initGLBuffers();
+  }
 }
