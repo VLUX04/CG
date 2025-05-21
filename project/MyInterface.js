@@ -22,11 +22,18 @@ export class MyInterface extends CGFinterface {
         const heliFolder = this.gui.addFolder("Helicopter Controls");
         heliFolder.add(this.scene, "speedFactor", 0.1, 3).name("Speed Factor");
 
+        
+        const buildingFolder = this.gui.addFolder("Building Controls");
+        buildingFolder.add(this.scene, "centralWidth", 5, 7.5, 0.1).name("Central Width").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "sideWidthPerc", 0.75, 1.5, 0.05).name("Side Width %").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "numFloors", 3, 5, 1).name("Floors").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "numWindows", 2, 4, 1).name("Windows").onChange(() => this.scene.updateBuilding());
+
         const forestFolder = this.gui.addFolder("Forest Controls");
         forestFolder.add(this.scene, "forestRows", 1, 10, 1).name("Rows").onChange(() => this.scene.updateForest());
         forestFolder.add(this.scene, "forestCols", 1, 10, 1).name("Columns").onChange(() => this.scene.updateForest());
-        forestFolder.add(this.scene, "forestWidth", 20, 50, 1).name("Width").onChange(() => this.scene.updateForest());
-        forestFolder.add(this.scene, "forestHeight", 20, 50, 1).name("Height").onChange(() => this.scene.updateForest());
+        forestFolder.add(this.scene, "forestWidth", 30, 50, 1).name("Width").onChange(() => this.scene.updateForest());
+        forestFolder.add(this.scene, "forestHeight", 30, 50, 1).name("Height").onChange(() => this.scene.updateForest());
 
 
         return true;
