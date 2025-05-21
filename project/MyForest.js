@@ -26,8 +26,8 @@ export class MyForest extends CGFobject {
 
                 const tree = new MyTree(scene, inclination, rotationAxis, trunkRadius, treeHeight, canopyColor, trunkTexture, canopyTexture);
 
-                const xOffset = (Math.random() - 0.5) * (areaWidth / cols) * 0.5; 
-                const zOffset = (Math.random() - 0.5) * (areaHeight / rows) * 0.5; 
+                const xOffset = (Math.random() - 0.5) * (areaWidth / cols) * 0.3; 
+                const zOffset = (Math.random() - 0.5) * (areaHeight / rows) * 0.3; 
                 this.trees.push({
                     tree: tree,
                     inclination: inclination,

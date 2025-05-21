@@ -30,7 +30,64 @@ export class MyBuilding extends CGFobject {
         this.buildingMaterial.setAmbient(buildingColor[0], buildingColor[1], buildingColor[2], 0.5);
         this.buildingMaterial.setDiffuse(buildingColor[0], buildingColor[1], buildingColor[2], 1);
         this.buildingMaterial.setShininess(10.0);
-        this.heliportTexture.loadTexture("textures/heliport.png");
+        this.heliportTextureH = new CGFappearance(scene);
+        this.heliportTextureH.loadTexture("textures/heliport.png");
+        this.heliportTextureUP = new CGFappearance(scene);
+        this.heliportTextureUP.loadTexture("textures/UP_image.png");
+        this.heliportTextureDOWN = new CGFappearance(scene);
+        this.heliportTextureDOWN.loadTexture("textures/DOWN_image.png");
+
+        this.currentHeliportTexture = this.heliportTextureH;
+    }
+
+    setHeliportTexture(mode) {
+        if (mode === "UP") this.currentHeliportTexture = this.heliportTextureUP;
+        else if (mode === "DOWN") this.currentHeliportTexture = this.heliportTextureDOWN;
+        else this.currentHeliportTexture = this.heliportTextureH;
+    }
+
+    drawHeliportSign(floors) {
+        this.scene.pushMatrix();
+        this.scene.translate(0, floors + 0.25 + 0.01, 0);
+        this.scene.rotate(-Math.PI / 2, 1, 0, 0);
+        const heliportSize = Math.min(this.centralWidth, this.depth * 1.25);
+        this.scene.scale(heliportSize, heliportSize, 1);
+        this.currentHeliportTexture.apply();
+        this.heliportQuad.display();
+        this.scene.popMatrix();
+        this.drawHeliportLights(heliportSize);
+    }
+    drawHeliportLights(heliportSize) {
+        // Default to no emission
+        const emission = this.scene.heliportLightEmission || [0, 0, 0, 1];
+        if (!this.heliportLightMaterial) {
+            this.heliportLightMaterial = new CGFappearance(this.scene);
+            this.heliportLightMaterial.setAmbient(0.1, 0.1, 0.1, 1);
+            this.heliportLightMaterial.setDiffuse(0.1, 0.1, 0.1, 1);
+            this.heliportLightMaterial.setSpecular(0.1, 0.1, 0.1, 1);
+            this.heliportLightMaterial.setShininess(10.0);
+        }
+        this.heliportLightMaterial.setEmission(...emission);
+
+        // Four corners of the heliport
+        const r = heliportSize / 2 * 0.92;
+        const y = 0.08;
+        const positions = [
+            [ r, y,  r],
+            [-r, y,  r],
+            [ r, y, -r],
+            [-r, y, -r]
+        ];
+        for (const [x, y, z] of positions) {
+            this.scene.pushMatrix();
+            this.scene.translate(x, y, z);
+            this.scene.scale(0.13, 0.13, 0.13);
+            this.heliportLightMaterial.apply();
+            if (!this.sphere) this.sphere = new MyQuad(this.scene); // Use a small quad or sphere
+            this.scene.sphereLight = this.scene.sphereLight || new MyQuad(this.scene);
+            this.scene.sphereLight.display();
+            this.scene.popMatrix();
+        }
     }
 
     display() {
@@ -94,7 +151,7 @@ export class MyBuilding extends CGFobject {
         this.scene.rotate(-Math.PI / 2, 1, 0, 0);
         const heliportSize = Math.min(this.centralWidth, this.depth * 1.25);
         this.scene.scale(heliportSize, heliportSize, 1);
-        this.heliportTexture.apply();
+        this.currentHeliportTexture.apply();
         this.heliportQuad.display();
     
         this.scene.popMatrix();
