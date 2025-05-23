@@ -5,6 +5,7 @@ import { MyBuilding } from "./MyBuilding.js";
 import { MyForest } from "./MyForest.js";
 import { MyHeli } from "./MyHeli.js";
 import { MyLake } from "./MyLake.js";
+import { MyFire } from "./MyFire.js";
 
 /**
  * MyScene
@@ -96,7 +97,13 @@ export class MyScene extends CGFscene {
         new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
     ];
 
-    this.setUpdatePeriod(50);
+    this.fires = [
+        new MyFire(this, 8, 2.5, 0.7),
+        new MyFire(this, 10, 2.2, 0.6),
+        new MyFire(this, 7, 2.8, 0.8)
+    ];
+
+    this.setUpdatePeriod(50); 
   }
 
   initLights() {
@@ -290,5 +297,18 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
     this.setActiveShader(this.defaultShader); 
+
+    const firePositions = [
+        [-24, 0, 0],
+        [-22, 0, -2],
+        [-20, 0, 0]
+    ];
+
+    for (let i = 0; i < this.fires.length; i++) {
+        this.pushMatrix();
+        this.translate(...firePositions[i]);
+        this.fires[i].display();
+        this.popMatrix();
+    }
   }
 }
