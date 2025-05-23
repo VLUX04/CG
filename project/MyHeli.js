@@ -21,12 +21,18 @@ export class MyHeli extends CGFobject {
         this.y = 0;
         this.z = 0;
         this.orientation = 0;
-        this.speed = 0.5;
+        this.speed = 1;
         this.inclination = 0;
         this.waterDropTime = 0;
         this.waterDropDuration = 60; 
         this.waterDropProgress = 0;
         this.heliportHeight = 0;
+
+        this.vx = 0;
+        this.vz = 0;
+        this.acceleration = 0.1;
+        this.friction = 0.9;
+        this.maxSpeed = 3;
 
         this.line = false;
         this.isAtRest = true;
@@ -92,7 +98,7 @@ export class MyHeli extends CGFobject {
         }
         if (this.heliLifting) {
             if (this.y < 25) {
-                this.y += this.speed;
+                this.y += this.speed / 2;
             } else {
                 this.heliLifting = false;
             }
@@ -103,7 +109,7 @@ export class MyHeli extends CGFobject {
 
 
         if (this.heliGoingHome && !this.heliLifting) {
-            const tolerance = 0.3;
+            const tolerance = 0.5;
             const orientationTolerance = 0.05;
 
             const dx = -this.x;
@@ -126,7 +132,7 @@ export class MyHeli extends CGFobject {
                 if (Math.abs(rotationDiff) > orientationTolerance) {
                     rotationDiff > 0 ? this.rotate(1,true) : this.rotate(-1,true);
                 } else if (this.y > this.heliportHeight) {
-                    this.y -= this.speed;
+                    this.y -= this.speed / 2;
                     this.line = false;
                 } else {
                     this.isAtRest = true;
@@ -136,13 +142,26 @@ export class MyHeli extends CGFobject {
         }
         if (this.heliGettingWater) {
             if (this.y > - 13) {
-                this.y -= this.speed;
+                this.y -= this.speed / 2;
             }
             else {
                 this.hasWater = true;
                 this.heliGettingWater = false;
             }
         }
+
+        const currentSpeed = Math.sqrt(this.vx * this.vx + this.vz * this.vz);
+        if (currentSpeed > this.maxSpeed) {
+            const scale = this.maxSpeed / currentSpeed;
+            this.vx *= scale;
+            this.vz *= scale;
+        }
+
+        this.x += this.vx;
+        this.z += this.vz;
+
+        this.vx *= this.friction;
+        this.vz *= this.friction;
     }
 
     updateHelice() {
@@ -168,9 +187,15 @@ export class MyHeli extends CGFobject {
     }
 
     acelerate(x, auto) {
-        this.x += (this.speed * (auto ? 1 : this.scene.speedFactor) * Math.sin(this.orientation)) * x;
-        this.z += (this.speed * (auto ? 1 : this.scene.speedFactor) * Math.cos(this.orientation)) * x;
-        this.inclination = 0.1 * x;
+        if (auto) {
+            this.x += (this.speed * Math.sin(this.orientation)) * x;
+            this.z += (this.speed * Math.cos(this.orientation)) * x;
+            this.inclination = 0.1 * x;
+        } else {
+            this.vx += this.acceleration * Math.sin(this.orientation) * x * this.scene.speedFactor;
+            this.vz += this.acceleration * Math.cos(this.orientation) * x * this.scene.speedFactor;
+            this.inclination = 0.1 * x;
+        }
     }
 
     rotate(x, auto) {

@@ -2,10 +2,12 @@ import { CGFobject, CGFappearance } from "../lib/CGF.js";
 import { MyWindow } from "./MyWindow.js";
 import { MyBox } from "./MyBox.js";
 import { MyQuad } from "./MyQuad.js";
+import { MySphere } from "./MySphere.js"; 
 
 export class MyBuilding extends CGFobject {
     constructor(scene, centralWidth, sideWidthPerc, numFloors, numWindows, windowTexture, buildingColor) {
         super(scene);
+        this.sphere = new MySphere(scene, 10, 10);
         this.centralWidth = centralWidth;
         this.sideWidth = Math.min(centralWidth * sideWidthPerc, 15);
         this.numFloors = numFloors;
@@ -19,6 +21,11 @@ export class MyBuilding extends CGFobject {
         this.buildingMaterial.setAmbient(buildingColor[0], buildingColor[1], buildingColor[2], 0.5);
         this.buildingMaterial.setDiffuse(buildingColor[0], buildingColor[1], buildingColor[2], 1);
         this.buildingMaterial.setShininess(10.0);
+
+        this.black = new CGFappearance(scene);
+        this.black.setAmbient(0, 0, 0, 0.5);
+        this.black.setDiffuse(0, 0, 0, 1);
+        this.black.setShininess(10.0);
 
         this.depth = this.centralWidth * 0.75;
 
@@ -55,10 +62,10 @@ export class MyBuilding extends CGFobject {
         this.currentHeliportTexture.apply();
         this.heliportQuad.display();
         this.scene.popMatrix();
-        this.drawHeliportLights(heliportSize);
+        this.drawHeliportLights(heliportSize, floors);
     }
-    drawHeliportLights(heliportSize) {
-        // Default to no emission
+
+    drawHeliportLights(heliportSize, floors) {
         const emission = this.scene.heliportLightEmission || [0, 0, 0, 1];
         if (!this.heliportLightMaterial) {
             this.heliportLightMaterial = new CGFappearance(this.scene);
@@ -69,9 +76,8 @@ export class MyBuilding extends CGFobject {
         }
         this.heliportLightMaterial.setEmission(...emission);
 
-        // Four corners of the heliport
-        const r = heliportSize / 2 * 0.92;
-        const y = 0.08;
+        const r = heliportSize / 2 * 0.9;
+        const y = floors + 0.25 + 0.01;
         const positions = [
             [ r, y,  r],
             [-r, y,  r],
@@ -83,13 +89,18 @@ export class MyBuilding extends CGFobject {
             this.scene.translate(x, y, z);
             this.scene.scale(0.13, 0.13, 0.13);
             this.heliportLightMaterial.apply();
-            if (!this.sphere) this.sphere = new MyQuad(this.scene); // Use a small quad or sphere
-            this.scene.sphereLight = this.scene.sphereLight || new MyQuad(this.scene);
-            this.scene.sphereLight.display();
+            this.sphere.display();
+            this.scene.popMatrix();
+        }
+        for (const [x, y, z] of positions) {
+            this.scene.pushMatrix();
+            this.scene.translate(x, y, z);
+            this.scene.scale(0.2, 0.01, 0.2);
+            this.black.apply();
+            this.sphere.display();
             this.scene.popMatrix();
         }
     }
-
     display() {
         this.scene.pushMatrix();
         this.scene.translate(-this.centralWidth / 2 - this.sideWidth/2, 0, 0);
@@ -144,18 +155,7 @@ export class MyBuilding extends CGFobject {
             this.scene.popMatrix();
         }
     }
-    drawHeliportSign(floors) {
-        this.scene.pushMatrix();
-    
-        this.scene.translate(0, floors + 0.25 + 0.01, 0);
-        this.scene.rotate(-Math.PI / 2, 1, 0, 0);
-        const heliportSize = Math.min(this.centralWidth, this.depth * 1.25);
-        this.scene.scale(heliportSize, heliportSize, 1);
-        this.currentHeliportTexture.apply();
-        this.heliportQuad.display();
-    
-        this.scene.popMatrix();
-    }
+
     drawEntrance() {
         this.scene.pushMatrix();
         this.scene.scale(0.7,0.7,1);

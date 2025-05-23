@@ -195,7 +195,7 @@ export class MyScene extends CGFscene {
 
     let blink = Math.floor((t / 250) % 2) === 0;
     const heli = this.helicopter;
-    if (heli.heliLifting) {
+    if (heli.heliLifting && heli.x < 1 && heli.z < 1) {
         this.building.setHeliportTexture(blink ? "H" : "UP");
     } else if (heli.heliGoingHome && heli.x < 1 && heli.z < 1) {
         this.building.setHeliportTexture(blink ? "H" : "DOWN");
@@ -203,12 +203,12 @@ export class MyScene extends CGFscene {
         this.building.setHeliportTexture("H");
     }
 
-    let isManeuvering = (heli.heliLifting || heli.heliGoingHome) && heli.x < 1 && heli.z < 1;
-    if (isManeuvering) {
+    const isBlinking = (heli.heliLifting || heli.heliGoingHome) && heli.x < 1 && heli.z < 1 ;
+    if (isBlinking) {
         const pulse = 0.5 + 0.5 * Math.sin(t / 200);
         this.heliportLightEmission = [pulse, pulse, 0, 1];
     } else {
-        this.heliportLightEmission = [0, 0, 0, 1];
+        this.heliportLightEmission = [1, 1, 0, 1]; 
     }
 
 
