@@ -5,7 +5,7 @@ import { MyQuad } from "./MyQuad.js";
 import { MySphere } from "./MySphere.js"; 
 
 export class MyBuilding extends CGFobject {
-    constructor(scene, centralWidth, sideWidthPerc, numFloors, numWindows, windowTexture, buildingColor) {
+    constructor(scene, centralWidth, sideWidthPerc, numFloors, numWindows, buildingColor,windowTexture, letreiroTexture, doorTexture, heliportTextureH, heliportTextureUP, heliportTextureDOWN) {
         super(scene);
         this.sphere = new MySphere(scene, 10, 10);
         this.centralWidth = centralWidth;
@@ -13,8 +13,8 @@ export class MyBuilding extends CGFobject {
         this.numFloors = numFloors;
         this.numWindows = numWindows;
         this.window = new MyWindow(scene, windowTexture);
-        this.letreiro = new MyWindow(scene, "textures/letreiro.png");
-        this.door = new MyWindow(scene, "textures/door.png");
+        this.letreiro = new MyWindow(scene, letreiroTexture);
+        this.door = new MyWindow(scene, doorTexture);
 
 
         this.buildingMaterial = new CGFappearance(scene);
@@ -22,27 +22,27 @@ export class MyBuilding extends CGFobject {
         this.buildingMaterial.setDiffuse(buildingColor[0], buildingColor[1], buildingColor[2], 1);
         this.buildingMaterial.setShininess(10.0);
 
-        this.black = new CGFappearance(scene);
-        this.black.setAmbient(0, 0, 0, 0.5);
-        this.black.setDiffuse(0, 0, 0, 1);
-        this.black.setShininess(10.0);
+        this.baseLightMaterial = new CGFappearance(scene);
+        this.baseLightMaterial.setAmbient(0, 0, 0, 0.5);
+        this.baseLightMaterial.setDiffuse(0, 0, 0, 1);
+        this.baseLightMaterial.setShininess(10.0);
 
         this.depth = this.centralWidth * 0.75;
 
-        this.box = new MyBox(scene);
+        this.boxLeft = new MyBox(scene, { left: true, right: false, bottom: false });
+        this.boxCenter = new MyBox(scene, { left: true, right: true, bottom: false });
+        this.boxRight = new MyBox(scene, { left: false, right: true, bottom: false });
 
         this.heliportQuad = new MyQuad(scene);
 
-        this.heliportTexture = new CGFappearance(scene);
-        this.buildingMaterial.setAmbient(buildingColor[0], buildingColor[1], buildingColor[2], 0.5);
-        this.buildingMaterial.setDiffuse(buildingColor[0], buildingColor[1], buildingColor[2], 1);
-        this.buildingMaterial.setShininess(10.0);
         this.heliportTextureH = new CGFappearance(scene);
-        this.heliportTextureH.loadTexture("textures/heliport.png");
+        this.heliportTextureH.setTexture(heliportTextureH);
+
         this.heliportTextureUP = new CGFappearance(scene);
-        this.heliportTextureUP.loadTexture("textures/UP_image.png");
+        this.heliportTextureUP.setTexture(heliportTextureUP);
+
         this.heliportTextureDOWN = new CGFappearance(scene);
-        this.heliportTextureDOWN.loadTexture("textures/DOWN_image.png");
+        this.heliportTextureDOWN.setTexture(heliportTextureDOWN);
 
         this.currentHeliportTexture = this.heliportTextureH;
     }
@@ -96,7 +96,7 @@ export class MyBuilding extends CGFobject {
             this.scene.pushMatrix();
             this.scene.translate(x, y, z);
             this.scene.scale(0.2, 0.01, 0.2);
-            this.black.apply();
+            this.baseLightMaterial.apply();
             this.sphere.display();
             this.scene.popMatrix();
         }
@@ -104,28 +104,29 @@ export class MyBuilding extends CGFobject {
     display() {
         this.scene.pushMatrix();
         this.scene.translate(-this.centralWidth / 2 - this.sideWidth/2, 0, 0);
-        this.drawModule(this.numFloors);
+        this.drawModule(this.numFloors, false, true, false); // Left
         this.scene.popMatrix();
 
         this.scene.pushMatrix();
         this.scene.translate(0, 0, this.depth * 0.25 / 2);
-        this.drawModule(this.numFloors + 1, true);
+        this.drawModule(this.numFloors + 1, true); // Center
         this.scene.popMatrix();
 
-     
         this.scene.pushMatrix();
         this.scene.translate(this.centralWidth /2 + this.sideWidth/2, 0, 0);
-        this.drawModule(this.numFloors);
+        this.drawModule(this.numFloors, false, false, true); // Right
         this.scene.popMatrix();
     }
 
-    drawModule(floors, isCentral = false) {
+    drawModule(floors, isCentral = false, isLeft = false) {
+
+        const box = isCentral ? this.boxCenter : (isLeft ? this.boxLeft : this.boxRight);
 
         this.scene.pushMatrix();
-        this.scene.scale(isCentral ? this.centralWidth : this.sideWidth, floors , isCentral ? this.depth * 1.25 : this.depth);
+        this.scene.scale(isCentral ? this.centralWidth : this.sideWidth, isCentral ? floors + 0.25 : floors , isCentral ? this.depth * 1.25 : this.depth);
         this.scene.translate(0, 0.5, 0);
         this.buildingMaterial.apply();
-        this.box.display(); 
+        box.display(); 
         this.scene.popMatrix();
     
         for (let i = 0; i < floors; i++) {
@@ -134,13 +135,6 @@ export class MyBuilding extends CGFobject {
             }
             if (isCentral && i === 0) this.drawEntrance();
         }
-    
-        this.scene.pushMatrix();
-        this.scene.translate(0, floors - 0.13, 0);
-        this.scene.scale(isCentral ? this.centralWidth : this.sideWidth, 0.75, isCentral ? this.depth * 1.25 : this.depth);
-        this.buildingMaterial.apply();
-        this.box.display(); 
-        this.scene.popMatrix();
     
         if (isCentral) this.drawHeliportSign(floors);
     }

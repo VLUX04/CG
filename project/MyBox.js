@@ -1,145 +1,62 @@
 import { CGFobject } from "../lib/CGF.js";
 
 export class MyBox extends CGFobject {
-    constructor(scene) {
+    constructor(scene, { front = true, back = true, top = true, bottom = true, left = true, right = true } = {}) {
         super(scene);
+        this.includeFaces = { front, back, top, bottom, left, right };
         this.initBuffers();
     }
 
     initBuffers() {
-        this.vertices = [
-            // Front face
-            -0.5, -0.5,  0.5,
-             0.5, -0.5,  0.5,
-             0.5,  0.5,  0.5,
-            -0.5,  0.5,  0.5,
+        const v = this.includeFaces;
+        const vertices = [], indices = [], normals = [], texCoords = [];
+        let index = 0;
 
-            // Back face
-            0.5, -0.5, -0.5,
-            -0.5, -0.5, -0.5,
-            -0.5,  0.5, -0.5,
-            0.5,  0.5, -0.5,
+        const addFace = (faceVerts, normal) => {
+            vertices.push(...faceVerts.flat());
+            normals.push(...Array(4).fill(normal).flat());
+            texCoords.push(...[
+                0, 0, 1, 0, 1, 1, 0, 1
+            ]);
+            indices.push(index, index + 1, index + 2, index, index + 2, index + 3);
+            index += 4;
+        };
 
-            // Top face
-            -0.5,  0.5,  0.5,
-             0.5,  0.5,  0.5,
-             0.5,  0.5, -0.5,
-            -0.5,  0.5, -0.5,
+        if (v.front)
+            addFace(
+                [[-0.5, -0.5,  0.5], [0.5, -0.5,  0.5], [0.5, 0.5, 0.5], [-0.5, 0.5, 0.5]],
+                [0, 0, 1]
+            );
+        if (v.back)
+            addFace(
+                [[0.5, -0.5, -0.5], [-0.5, -0.5, -0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5]],
+                [0, 0, -1]
+            );
+        if (v.top)
+            addFace(
+                [[-0.5, 0.5, 0.5], [0.5, 0.5, 0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, -0.5]],
+                [0, 1, 0]
+            );
+        if (v.bottom)
+            addFace(
+                [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, -0.5, 0.5], [-0.5, -0.5, 0.5]],
+                [0, -1, 0]
+            );
+        if (v.right)
+            addFace(
+                [[0.5, -0.5, 0.5], [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [0.5, 0.5, 0.5]],
+                [1, 0, 0]
+            );
+        if (v.left)
+            addFace(
+                [[-0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [-0.5, 0.5, 0.5], [-0.5, 0.5, -0.5]],
+                [-1, 0, 0]
+            );
 
-            // Bottom face
-            -0.5, -0.5, -0.5,
-             0.5, -0.5, -0.5,
-             0.5, -0.5,  0.5,
-            -0.5, -0.5,  0.5,
-
-            // Right face
-            0.5, -0.5,  0.5,
-            0.5, -0.5, -0.5,
-            0.5,  0.5, -0.5,
-            0.5,  0.5,  0.5,
-
-            // Left face
-            -0.5, -0.5, -0.5,
-            -0.5, -0.5,  0.5,
-            -0.5,  0.5,  0.5,
-            -0.5,  0.5, -0.5,
-        ];
-
-        this.indices = [
-            // Front face
-            0, 1, 2,
-            0, 2, 3,
-
-            // Back face
-            4, 5, 6,
-            4, 6, 7,
-
-            // Top face
-            8, 9,10,
-            8,10,11,
-
-            // Bottom face
-           12,13,14,
-           12,14,15,
-
-            // Right face
-           16,17,18,
-           16,18,19,
-
-            // Left face
-           20,21,22,
-           20,22,23,
-        ];
-
-        this.normals = [
-            // Front face 
-             0,  0,  1,
-             0,  0,  1,
-             0,  0,  1,
-             0,  0,  1,
-
-            // Back face
-             0,  0, -1,
-             0,  0, -1,
-             0,  0, -1,
-             0,  0, -1,
-
-            // Top face
-             0,  1,  0,
-             0,  1,  0,
-             0,  1,  0,
-             0,  1,  0,
-
-            // Bottom face
-             0, -1,  0,
-             0, -1,  0,
-             0, -1,  0,
-             0, -1,  0,
-
-            // Right face
-             1,  0,  0,
-             1,  0,  0,
-             1,  0,  0,
-             1,  0,  0,
-
-            // Left face
-            -1,  0,  0,
-            -1,  0,  0,
-            -1,  0,  0,
-            -1,  0,  0,
-        ];
-
-        this.texCoords = [
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-        ];
+        this.vertices = vertices;
+        this.indices = indices;
+        this.normals = normals;
+        this.texCoords = texCoords;
 
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();

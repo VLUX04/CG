@@ -55,14 +55,26 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 64);
     this.helicopter = new MyHeli(this);
 
+    this.heliportTextureH = new CGFtexture(this, "textures/heliport.png");
+    this.heliportTextureUP = new CGFtexture(this, "textures/UP_image.png");
+    this.heliportTextureDOWN = new CGFtexture(this, "textures/DOWN_image.png");
+    this.windowTexture = new CGFtexture(this, "textures/window.jpg");
+    this.letreiroTexture = new CGFtexture(this, "textures/letreiro.png");
+    this.doorTexture = new CGFtexture(this, "textures/door.png");
+
     this.building = new MyBuilding(
       this,
       5,
       0.75, 
       3,
       2,
-      "textures/window.jpg",
-      [1, 1, 1]
+      [1, 1, 1],
+      this.windowTexture,
+      this.letreiroTexture,
+      this.doorTexture,
+      this.heliportTextureH,
+      this.heliportTextureUP,
+      this.heliportTextureDOWN
     );
 
     this.panorama = new MyPanorama(this, "textures/sky.jpg");
@@ -89,10 +101,6 @@ export class MyScene extends CGFscene {
     this.lakeTexture = new CGFtexture(this, "textures/waterTex.jpg");
     this.lakeTexture2 = new CGFtexture(this, "textures/waterMap.jpg");
 
-    this.heliportTextureH = new CGFtexture("textures/heliport.png");
-    this.heliportTextureUP = new CGFtexture("textures/UP_image.png");
-    this.heliportTextureDOWN = new CGFtexture("textures/DOWN_image.png");
-
     this.testShaders = [
         new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
     ];
@@ -117,8 +125,8 @@ export class MyScene extends CGFscene {
       1,
       0.1,
       1000,
-      vec3.fromValues(15, 15, 15),
-      vec3.fromValues(0, 0, -10)
+      vec3.fromValues(-15, 15, 45),
+      vec3.fromValues(0, 0, -15)
     );
   }
   checkKeys() {
@@ -128,7 +136,7 @@ export class MyScene extends CGFscene {
 
     let moved = false;
 
-    if (canMove) {
+    if (canMove && h.bucketLiftProgress == 1) {
       if (pressing("KeyW")) {
         h.acelerate(1, false);
         moved = true;
@@ -144,6 +152,7 @@ export class MyScene extends CGFscene {
         h.rotate(-1, false);
         moved = true;
       }
+      
     }
 
     if (pressing("KeyP") && !h.heliGettingWater) {
@@ -182,8 +191,10 @@ export class MyScene extends CGFscene {
           this.sideWidthPerc,
           this.numFloors,
           this.numWindows,
-          "textures/window.jpg",
           [1, 1, 1],
+          this.windowTexture,
+          this.letreiroTexture,
+          this.doorTexture,
           this.heliportTextureH,
           this.heliportTextureUP,
           this.heliportTextureDOWN
@@ -202,15 +213,15 @@ export class MyScene extends CGFscene {
 
     let blink = Math.floor((t / 250) % 2) === 0;
     const heli = this.helicopter;
-    if (heli.heliLifting && heli.x < 1 && heli.z < 1) {
+    if (heli.heliLifting && heli.x < 0.5 && heli.z < 0.5) {
         this.building.setHeliportTexture(blink ? "H" : "UP");
-    } else if (heli.heliGoingHome && heli.x < 1 && heli.z < 1) {
+    } else if (heli.heliGoingHome && heli.x < 0.5 && heli.z < 0.5 && heli.orientation < 0.05) {
         this.building.setHeliportTexture(blink ? "H" : "DOWN");
     } else {
         this.building.setHeliportTexture("H");
     }
 
-    const isBlinking = (heli.heliLifting || heli.heliGoingHome) && heli.x < 1 && heli.z < 1 ;
+    const isBlinking = (heli.heliLifting || heli.heliGoingHome) && heli.x < 0.5 && heli.z < 0.5 ;
     if (isBlinking) {
         const pulse = 0.5 + 0.5 * Math.sin(t / 200);
         this.heliportLightEmission = [pulse, pulse, 0, 1];

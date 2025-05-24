@@ -28,6 +28,9 @@ export class MyHeli extends CGFobject {
         this.waterDropProgress = 0;
         this.heliportHeight = 0;
 
+        this.bucketLiftProgress = 0; 
+        this.bucketLiftSpeed = 0.04;
+
         this.vx = 0;
         this.vz = 0;
         this.acceleration = 0.1;
@@ -75,7 +78,7 @@ export class MyHeli extends CGFobject {
         this.body = new MySphere(scene, 16, 16);
         this.rotorCenter = new MyCylinder(scene, 16, 16);
         this.tail = new MyTruncatedCone(scene, this.tailLength, this.tailRadius, false);
-        this.box = new MyBox(scene);
+        this.box = new MyBox(scene, true, true, true, true, true, true);
         this.bucket = new MyTruncatedCone(scene, this.bucketHeight, this.bucketRadius, false);
 
         this.initBuffers();
@@ -104,8 +107,13 @@ export class MyHeli extends CGFobject {
             }
         }
 
-        this.line = !this.isAtRest && !this.heliLifting || ( this.hasWater && this.heliLifting);
+        this.line = !this.isAtRest && !this.heliLifting && !(this.heliGoingHome && this.x < 0.5 && this.z < 0.5 && this.x > -0.5 && this.z > -0.5 && this.orientation < 0.1 && this.orientation > -0.1);
 
+        if (this.line) {
+            this.bucketLiftProgress = Math.min(1, this.bucketLiftProgress + this.bucketLiftSpeed);
+        } else {
+            this.bucketLiftProgress = Math.max(0, this.bucketLiftProgress - this.bucketLiftSpeed);
+        }
 
 
         if (this.heliGoingHome && !this.heliLifting) {
@@ -127,14 +135,12 @@ export class MyHeli extends CGFobject {
                 }
             }
             else {
-                console.log(this.y, this.heliportHeight);
                 const rotationDiff = this.normalizeAngle(0 - this.orientation);
                 if (Math.abs(rotationDiff) > orientationTolerance) {
                     rotationDiff > 0 ? this.rotate(1,true) : this.rotate(-1,true);
-                } else if (this.y > this.heliportHeight) {
+                } else if (this.y > this.heliportHeight && this.bucketLiftProgress < 0.01) {
                     this.y -= this.speed / 2;
-                    this.line = false;
-                } else {
+                } else if (this.bucketLiftProgress < 0.01) {
                     this.isAtRest = true;
                     this.heliGoingHome = false;
                 }
@@ -253,22 +259,23 @@ export class MyHeli extends CGFobject {
         this.makeRotor();
         this.scene.popMatrix();
 
+        const bucketY = -0.5 - 4.5 * this.bucketLiftProgress;
 
         // Bucket
         this.scene.pushMatrix();
         this.bucketMaterial.apply();
-        this.scene.translate(0, this.line ? -5 : -0.5 , 0);
-        this.scene.rotate(Math.PI , 1, 0, 0);
+        this.scene.translate(0, bucketY, 0);
+        this.scene.rotate(Math.PI, 1, 0, 0);
         this.scene.scale(2, 1.5, 2);
         this.bucket.display();
         this.scene.popMatrix();
 
-        if (this.line) {
+        if (this.bucketLiftProgress > 0.01) {
             this.scene.pushMatrix();
             this.rotorMaterial.apply();
             this.scene.translate(0, -2.5, 0);
             this.scene.rotate(Math.PI / 2, 1, 0, 0);
-            this.scene.scale(0.1, 0.1, 5);
+            this.scene.scale(0.1, 0.1, 5 * this.bucketLiftProgress);
             this.box.display();
             this.scene.popMatrix();
         }
@@ -276,7 +283,7 @@ export class MyHeli extends CGFobject {
         if (this.hasWater) {
             this.scene.pushMatrix();
             this.waterMaterial.apply();
-            this.scene.translate(0, this.line ? -5 : -0.5 , 0);
+            this.scene.translate(0, -5, 0);
             this.scene.rotate(Math.PI , 1, 0, 0);
             this.scene.scale(0.9, 0.1, 0.9);
             this.body.display();
