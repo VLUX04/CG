@@ -106,6 +106,7 @@ export class MyScene extends CGFscene {
 
     this.testShaders = [
         new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
+        new CGFshader(this.gl, "shaders/fire.vert", "shaders/fire.frag"),
     ];
 
     this.yellowFireTexture = new CGFtexture(this, "textures/yellow_fire.jpg");
@@ -344,16 +345,25 @@ export class MyScene extends CGFscene {
     this.setActiveShader(this.defaultShader); 
 
     for (let i = 0; i < this.fires.length; i++) {
-        this.pushMatrix();
-        this.translate(...this.firePositions[i]);
+      this.pushMatrix();
+      this.translate(...this.firePositions[i]);
+      this.setActiveShader(this.testShaders[1]);
 
-        this.fireAppearances[0].apply();
-        this.fires[i].displayLayer(0); // Outer layer (yellow)
+      this.testShaders[1].setUniformsValues({
+          uTime: performance.now() / 1000.0,
+          uRandomness: 35 + i * 5,
+      });
 
-        this.fireAppearances[1].apply();
-        this.fires[i].displayLayer(1); // Middle layer (orange)
+      // Yellow fire
+      this.fireAppearances[0].apply();
+      this.fires[i].displayLayer(0);
 
-        this.popMatrix();
+      // Orange fire
+      this.fireAppearances[1].apply();
+      this.fires[i].displayLayer(1);
+
+      this.setActiveShader(this.defaultShader);
+      this.popMatrix();
     }
   }
 }
