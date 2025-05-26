@@ -31,7 +31,10 @@ export class MyScene extends CGFscene {
 
     this.lakePosition = { x: 25, z: 0 };
     this.lakeSize = { width: 30, depth: 30 }; 
+
+    this.fires = [];
   }
+
   init(application) {
     super.init(application);
 
@@ -105,13 +108,44 @@ export class MyScene extends CGFscene {
         new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
     ];
 
-    this.fires = [
-        new MyFire(this, 8, 2.5, 0.7),
-        new MyFire(this, 10, 2.2, 0.6),
-        new MyFire(this, 7, 2.8, 0.8)
+    this.yellowFireTexture = new CGFtexture(this, "textures/yellow_fire.jpg");
+    this.orangeFireTexture = new CGFtexture(this, "textures/orange_fire.jpg");
+    this.fireAppearances = [
+        new CGFappearance(this),
+        new CGFappearance(this),
     ];
+    this.fireAppearances[0].setAmbient(1.0, 1.0, 0.2, 1.0);
+    this.fireAppearances[0].setDiffuse(1.0, 1.0, 0.2, 1.0);
+    this.fireAppearances[0].setEmission(1.0, 1.0, 0.2, 1.0);
+    this.fireAppearances[0].setTexture(this.yellowFireTexture);
+    this.fireAppearances[1].setAmbient(1.0, 0.5, 0.1, 1.0);
+    this.fireAppearances[1].setDiffuse(1.0, 0.5, 0.1, 1.0);
+    this.fireAppearances[1].setEmission(1.0, 0.5, 0.1, 1.0);
+    this.fireAppearances[1].setTexture(this.orangeFireTexture);
+    const minDistance = 2; 
+    this.firePositions = this.generateFirePositions(this.forest, 3, minDistance);
+    for (let i = 0; i < this.firePositions.length; i++) {
+        this.fires.push(new MyFire(this, 8, 2.5, 0.7));
+    }
 
     this.setUpdatePeriod(50); 
+  }
+
+  generateFirePositions(forest, numFires, minDistance) {
+    const firePositions = [];
+
+    const selectedTree = forest.trees[14];
+    const angles = [0, (2 * Math.PI) / 3, (4 * Math.PI) / 3];
+
+    for (let i = 0; i < numFires; i++) {
+        const angle = angles[i];
+        const x = selectedTree.x + Math.cos(angle) * minDistance;
+        const z = selectedTree.z + Math.sin(angle) * minDistance;
+
+        firePositions.push([x - 20, 0, z]);
+    }
+
+    return firePositions;
   }
 
   initLights() {
@@ -309,16 +343,16 @@ export class MyScene extends CGFscene {
 
     this.setActiveShader(this.defaultShader); 
 
-    const firePositions = [
-        [-24, 0, 0],
-        [-22, 0, -2],
-        [-20, 0, 0]
-    ];
-
     for (let i = 0; i < this.fires.length; i++) {
         this.pushMatrix();
-        this.translate(...firePositions[i]);
-        this.fires[i].display();
+        this.translate(...this.firePositions[i]);
+
+        this.fireAppearances[0].apply();
+        this.fires[i].displayLayer(0); // Outer layer (yellow)
+
+        this.fireAppearances[1].apply();
+        this.fires[i].displayLayer(1); // Middle layer (orange)
+
         this.popMatrix();
     }
   }
