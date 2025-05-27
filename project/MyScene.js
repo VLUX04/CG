@@ -14,7 +14,6 @@ import { MyFire } from "./MyFire.js";
 export class MyScene extends CGFscene {
   constructor() {
     super();
-
     this.centralWidth = 5;
     this.sideWidthPerc = 0.75; 
     this.numFloors = 3;
@@ -26,7 +25,6 @@ export class MyScene extends CGFscene {
     this.forestHeight = 30;
 
     this.speedFactor = 3;
-
     this.heliportHeight = 3.33 * (this.numFloors - 3);
 
     this.lakePosition = { x: 25, z: 0 };
@@ -37,83 +35,73 @@ export class MyScene extends CGFscene {
 
   init(application) {
     super.init(application);
-
     this.initCameras();
     this.initLights();
+    this.initGLSettings();
+    this.initTextures();
+    this.initAppearances();
+    this.initShaders();
+    this.initObjects();
+    this.setUpdatePeriod(50);
+  }
 
+  initGLSettings() {
     this.gl.clearColor(0, 0, 0, 1.0);
-
     this.gl.clearDepth(100.0);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.depthFunc(this.gl.LEQUAL);
-
     this.enableTextures(true);
+  }
 
-    this.setUpdatePeriod(50);
-
-    this.axis = new CGFaxis(this, 20, 1);
-    this.plane = new MyPlane(this, 64);
-    this.helicopter = new MyHeli(this);
-
+  initTextures() {
+    // Building
     this.heliportTextureH = new CGFtexture(this, "textures/heliport.png");
     this.heliportTextureUP = new CGFtexture(this, "textures/UP_image.png");
     this.heliportTextureDOWN = new CGFtexture(this, "textures/DOWN_image.png");
     this.windowTexture = new CGFtexture(this, "textures/window.jpg");
     this.letreiroTexture = new CGFtexture(this, "textures/letreiro.png");
     this.doorTexture = new CGFtexture(this, "textures/door.png");
-
-    this.building = new MyBuilding(
-      this,
-      5,
-      0.75, 
-      3,
-      2,
-      [1, 1, 1],
-      this.windowTexture,
-      this.letreiroTexture,
-      this.doorTexture,
-      this.heliportTextureH,
-      this.heliportTextureUP,
-      this.heliportTextureDOWN
-    );
-
-    this.panorama = new MyPanorama(this, "textures/sky.jpg");
-
+    
+    // Forest
     this.trunkTexture = new CGFtexture(this, "textures/trunk.jpg");
     this.canopyTexture = new CGFtexture(this, "textures/tree_crown.jpg");
-    this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
-    
-    this.lake = new MyLake(this);
 
-    this.grassTexture = new CGFappearance(this);
-    this.grassTexture.setAmbient(0.3, 0.3, 0.3, 1);
-    this.grassTexture.setDiffuse(0.7, 0.7, 0.7, 1);
-    this.grassTexture.setSpecular(0.0, 0.0, 0.0, 1);
-    this.grassTexture.setShininess(10.0);
-    this.grassTexture.loadTexture("textures/grass.jpg");
-    this.grassTexture.setTextureWrap("REPEAT", "REPEAT");
+    // Lake
+    this.lakeTexture = new CGFtexture(this, "textures/waterTex.jpg");
+    this.lakeTexture2 = new CGFtexture(this, "textures/waterMap.jpg");
 
+    // Fire
+    this.yellowFireTexture = new CGFtexture(this, "textures/yellow_fire.jpg");
+    this.orangeFireTexture = new CGFtexture(this, "textures/orange_fire.jpg");
+
+    // Grass
+    this.grassTexture = new CGFtexture(this, "textures/grass.jpg");
+  }
+
+  initAppearances() {
+    // Grass
+    this.grassAppearance = new CGFappearance(this);
+    this.grassAppearance.setAmbient(0.3, 0.3, 0.3, 1);
+    this.grassAppearance.setDiffuse(0.7, 0.7, 0.7, 1);
+    this.grassAppearance.setSpecular(0.0, 0.0, 0.0, 1);
+    this.grassAppearance.setShininess(10.0);
+    this.grassAppearance.setTexture(this.grassTexture);
+    this.grassAppearance.setTextureWrap("REPEAT", "REPEAT");
+
+    // Lake
     this.lakeAppearance = new CGFappearance(this);
     this.lakeAppearance.setAmbient(0.3, 0.3, 0.3, 1);
     this.lakeAppearance.setDiffuse(0.7, 0.7, 0.7, 1);
     this.lakeAppearance.setSpecular(0.0, 0.0, 0.0, 1);
     this.lakeAppearance.setShininess(120);
-    this.lakeTexture = new CGFtexture(this, "textures/waterTex.jpg");
-    this.lakeTexture2 = new CGFtexture(this, "textures/waterMap.jpg");
 
-    this.testShaders = [
-        new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
-        new CGFshader(this.gl, "shaders/fire.vert", "shaders/fire.frag"),
-    ];
-
-    this.yellowFireTexture = new CGFtexture(this, "textures/yellow_fire.jpg");
-    this.orangeFireTexture = new CGFtexture(this, "textures/orange_fire.jpg");
+    // Fire
     this.fireAppearances = [
-        new CGFappearance(this),
-        new CGFappearance(this),
+      new CGFappearance(this),
+      new CGFappearance(this),
     ];
     this.fireAppearances[0].setAmbient(1.0, 1.0, 0.2, 1.0);
     this.fireAppearances[0].setDiffuse(1.0, 1.0, 0.2, 1.0);
@@ -121,16 +109,64 @@ export class MyScene extends CGFscene {
     this.fireAppearances[1].setAmbient(1.0, 0.5, 0.1, 1.0);
     this.fireAppearances[1].setDiffuse(1.0, 0.5, 0.1, 1.0);
     this.fireAppearances[1].setEmission(1.0, 0.5, 0.1, 1.0);
-    const minDistance = 2; 
+  }
+
+  initShaders() {
+    this.testShaders = [
+      new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
+      new CGFshader(this.gl, "shaders/fire.vert", "shaders/fire.frag"),
+    ];
+  }
+
+  initObjects() {
+    this.axis = new CGFaxis(this, 20, 1);
+    this.plane = new MyPlane(this, 64);
+    this.helicopter = new MyHeli(this);
+    this.building = new MyBuilding(
+      this, 
+      this.centralWidth, 
+      this.sideWidthPerc, 
+      this.numFloors, 
+      this.numWindows,
+      [1, 1, 1], 
+      this.windowTexture, 
+      this.letreiroTexture, 
+      this.doorTexture,
+      this.heliportTextureH, 
+      this.heliportTextureUP, 
+      this.heliportTextureDOWN
+    );
+    this.panorama = new MyPanorama(this, "textures/sky.jpg");
+    this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
+    this.lake = new MyLake(this);
+
+    // Fire positions and objects
+    const minDistance = 2;
     this.firePositions = this.generateFirePositions(this.forest, 3, minDistance);
     for (let i = 0; i < this.firePositions.length; i++) {
-        this.fires.push(new MyFire(this, 8, 2.5, 0.7));
+      this.fires.push(new MyFire(this, 8, 2.5, 0.7));
     }
+  }
+
+  initLights() {
+    this.lights[0].setPosition(200, 200, 200, 1);
+    this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
+    this.lights[0].enable();
+    this.lights[0].update();
+  }
+
+  initCameras() {
+    this.camera = new CGFcamera(
+      1,
+      0.1,
+      1000,
+      vec3.fromValues(-15, 15, 45),
+      vec3.fromValues(0, 0, -15)
+    );
   }
 
   generateFirePositions(forest, numFires, minDistance) {
     const firePositions = [];
-
     const selectedTree = forest.trees[14];
     const angles = [0, (2 * Math.PI) / 3, (4 * Math.PI) / 3];
 
@@ -145,21 +181,6 @@ export class MyScene extends CGFscene {
     return firePositions;
   }
 
-  initLights() {
-    this.lights[0].setPosition(200, 200, 200, 1);
-    this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
-    this.lights[0].enable();
-    this.lights[0].update();
-  }
-  initCameras() {
-    this.camera = new CGFcamera(
-      1,
-      0.1,
-      1000,
-      vec3.fromValues(-15, 15, 45),
-      vec3.fromValues(0, 0, -15)
-    );
-  }
   checkKeys() {
     const h = this.helicopter;
     const pressing = (key) => this.gui.isKeyPressed(key);
@@ -216,22 +237,22 @@ export class MyScene extends CGFscene {
   }
 
   updateBuilding() {
-      this.building = new MyBuilding(
-          this,
-          this.centralWidth,
-          this.sideWidthPerc,
-          this.numFloors,
-          this.numWindows,
-          [1, 1, 1],
-          this.windowTexture,
-          this.letreiroTexture,
-          this.doorTexture,
-          this.heliportTextureH,
-          this.heliportTextureUP,
-          this.heliportTextureDOWN
-      );
-      this.helicopter.heliportHeight = 3.33 * (this.numFloors - 3);
-      this.helicopter.update()
+    this.building = new MyBuilding(
+        this,
+        this.centralWidth,
+        this.sideWidthPerc,
+        this.numFloors,
+        this.numWindows,
+        [1, 1, 1],
+        this.windowTexture,
+        this.letreiroTexture,
+        this.doorTexture,
+        this.heliportTextureH,
+        this.heliportTextureUP,
+        this.heliportTextureDOWN
+    );
+    this.helicopter.heliportHeight = 3.33 * (this.numFloors - 3);
+    this.helicopter.update()
   }
 
   update(t) {
@@ -270,7 +291,6 @@ export class MyScene extends CGFscene {
     this.camera.position[2] = Math.max(-planeSize, Math.min(planeSize, this.camera.position[2]));
   }
 
-
   updateForest() {
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
   }
@@ -292,77 +312,75 @@ export class MyScene extends CGFscene {
 
     this.setDefaultAppearance();
 
+    // Grass terrain
     this.pushMatrix();
-    this.grassTexture.apply();
+    this.grassAppearance.apply();
     this.scale(400, 1, 400);
     this.rotate(-Math.PI / 2, 1, 0, 0);
     this.plane.display();
     this.popMatrix();
 
+    // Panorama sky
     this.pushMatrix();
     this.panorama.display(this.camera.position);
     this.popMatrix();
 
+    // Building
     this.pushMatrix();
     this.scale(2, 2, 2); 
     this.translate(0, 0, -20);
     this.building.display();
     this.popMatrix();
 
+    // Forest
     this.pushMatrix();
     this.translate(-20, 0, 0);
     this.forest.display(); 
     this.popMatrix();
 
+    // Fires
     for (let i = 0; i < this.fires.length; i++) {
       this.pushMatrix();
       this.translate(...this.firePositions[i]);
       this.setActiveShader(this.testShaders[1]);
-
       this.testShaders[1].setUniformsValues({
           uTime: performance.now() / 1000.0,
           uRandomness: 35 + i * 5,
       });
-
       // Yellow fire
       this.fireAppearances[0].apply(); 
       this.yellowFireTexture.bind(0); 
       this.fires[i].displayLayer(0);
-
       // Orange fire
       this.fireAppearances[1].apply(); 
       this.orangeFireTexture.bind(0); 
       this.fires[i].displayLayer(1);
-
       this.popMatrix();
     }
-    
     this.setActiveShader(this.defaultShader);
 
+    // Helicopter
     this.pushMatrix();
     this.translate(0, 10, -39);
     this.scale(0.6,0.6,0.6)
     this.helicopter.display();
     this.popMatrix();
 
+    // Lake
     this.lakeAppearance.apply();
     this.setActiveShader(this.testShaders[0]);
-
     this.testShaders[0].setUniformsValues({
         uSampler: 0,    
         uSampler2: 1,   
         waterMap: 1    
     });
-
     this.lakeTexture.bind(0);   
     this.lakeTexture2.bind(1);  
-
     this.pushMatrix();
     this.translate(25, 0.1, 0);
     this.scale(20, 1, 20);      
     this.lake.display();
     this.popMatrix();
-
     this.setActiveShader(this.defaultShader); 
   }
 }
