@@ -30,6 +30,8 @@ export class MyScene extends CGFscene {
     this.lakePosition = { x: 25, z: 0 };
     this.lakeSize = { width: 30, depth: 30 }; 
 
+    this.minDistance = 2;
+    this.numFires = 4;
     this.fires = [];
   }
 
@@ -141,8 +143,7 @@ export class MyScene extends CGFscene {
     this.lake = new MyLake(this);
 
     // Fire positions and objects
-    const minDistance = 2;
-    this.firePositions = this.generateFirePositions(this.forest, 3, minDistance);
+    this.firePositions = this.generateFirePositions(this.forest, this.numFires, this.minDistance);
     for (let i = 0; i < this.firePositions.length; i++) {
       this.fires.push(new MyFire(this, 8, 2.5, 0.7));
     }
@@ -167,17 +168,14 @@ export class MyScene extends CGFscene {
 
   generateFirePositions(forest, numFires, minDistance) {
     const firePositions = [];
-    const selectedTree = forest.trees[14];
-    const angles = [0, (2 * Math.PI) / 3, (4 * Math.PI) / 3];
-
+    const selectedTree = forest.trees[0];
     for (let i = 0; i < numFires; i++) {
-        const angle = angles[i];
-        const x = selectedTree.x + Math.cos(angle) * minDistance;
-        const z = selectedTree.z + Math.sin(angle) * minDistance;
+      const angle = (2 * Math.PI * i) / numFires;
+      const x = selectedTree.x + Math.cos(angle) * minDistance;
+      const z = selectedTree.z + Math.sin(angle) * minDistance;
 
-        firePositions.push([x - 20, 0, z]);
+      firePositions.push([x - 20, 0, z]);
     }
-
     return firePositions;
   }
 
@@ -293,6 +291,7 @@ export class MyScene extends CGFscene {
 
   updateForest() {
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
+    this.firePositions = this.generateFirePositions(this.forest, this.numFires, this.minDistance);
   }
 
   setDefaultAppearance() {
