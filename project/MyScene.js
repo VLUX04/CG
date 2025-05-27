@@ -118,18 +118,14 @@ export class MyScene extends CGFscene {
     this.fireAppearances[0].setAmbient(1.0, 1.0, 0.2, 1.0);
     this.fireAppearances[0].setDiffuse(1.0, 1.0, 0.2, 1.0);
     this.fireAppearances[0].setEmission(1.0, 1.0, 0.2, 1.0);
-    this.fireAppearances[0].setTexture(this.yellowFireTexture);
     this.fireAppearances[1].setAmbient(1.0, 0.5, 0.1, 1.0);
     this.fireAppearances[1].setDiffuse(1.0, 0.5, 0.1, 1.0);
     this.fireAppearances[1].setEmission(1.0, 0.5, 0.1, 1.0);
-    this.fireAppearances[1].setTexture(this.orangeFireTexture);
     const minDistance = 2; 
     this.firePositions = this.generateFirePositions(this.forest, 3, minDistance);
     for (let i = 0; i < this.firePositions.length; i++) {
         this.fires.push(new MyFire(this, 8, 2.5, 0.7));
     }
-
-    this.setUpdatePeriod(50); 
   }
 
   generateFirePositions(forest, numFires, minDistance) {
@@ -318,6 +314,31 @@ export class MyScene extends CGFscene {
     this.forest.display(); 
     this.popMatrix();
 
+    for (let i = 0; i < this.fires.length; i++) {
+      this.pushMatrix();
+      this.translate(...this.firePositions[i]);
+      this.setActiveShader(this.testShaders[1]);
+
+      this.testShaders[1].setUniformsValues({
+          uTime: performance.now() / 1000.0,
+          uRandomness: 35 + i * 5,
+      });
+
+      // Yellow fire
+      this.fireAppearances[0].apply(); 
+      this.yellowFireTexture.bind(0); 
+      this.fires[i].displayLayer(0);
+
+      // Orange fire
+      this.fireAppearances[1].apply(); 
+      this.orangeFireTexture.bind(0); 
+      this.fires[i].displayLayer(1);
+
+      this.popMatrix();
+    }
+    
+    this.setActiveShader(this.defaultShader);
+
     this.pushMatrix();
     this.translate(0, 10, -39);
     this.scale(0.6,0.6,0.6)
@@ -343,27 +364,5 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
     this.setActiveShader(this.defaultShader); 
-
-    for (let i = 0; i < this.fires.length; i++) {
-      this.pushMatrix();
-      this.translate(...this.firePositions[i]);
-      this.setActiveShader(this.testShaders[1]);
-
-      this.testShaders[1].setUniformsValues({
-          uTime: performance.now() / 1000.0,
-          uRandomness: 35 + i * 5,
-      });
-
-      // Yellow fire
-      this.fireAppearances[0].apply();
-      this.fires[i].displayLayer(0);
-
-      // Orange fire
-      this.fireAppearances[1].apply();
-      this.fires[i].displayLayer(1);
-
-      this.setActiveShader(this.defaultShader);
-      this.popMatrix();
-    }
   }
 }
