@@ -81,6 +81,9 @@ export class MyScene extends CGFscene {
 
     // Grass
     this.grassTexture = new CGFtexture(this, "textures/grass.jpg");
+
+    // Sky
+    this.skyTexture = new CGFtexture(this, "textures/sky.jpg");
   }
 
   initAppearances() {
@@ -138,7 +141,7 @@ export class MyScene extends CGFscene {
       this.heliportTextureUP, 
       this.heliportTextureDOWN
     );
-    this.panorama = new MyPanorama(this, "textures/sky.jpg");
+    this.panorama = new MyPanorama(this, this.skyTexture);
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
     this.lake = new MyLake(this);
 

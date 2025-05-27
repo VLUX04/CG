@@ -11,7 +11,7 @@ export class MyPanorama {
         this.material.setDiffuse(0.0, 0.0, 0.0, 1.0);
         this.material.setSpecular(0.0, 0.0, 0.0, 1.0);
         this.material.setShininess(10.0);
-        this.material.loadTexture(texture);
+        this.material.setTexture(texture);
         this.material.setTextureWrap("CLAMP_TO_EDGE", "CLAMP_TO_EDGE");
     }
 
