@@ -12,7 +12,6 @@ import {CGFobject} from '../lib/CGF.js';
 export class MyPlane extends CGFobject {
 	constructor(scene, nrDivs, minS, maxS, minT, maxT) {
 		super(scene);
-		// nrDivs = 1 if not provided
 		nrDivs = typeof nrDivs !== 'undefined' ? nrDivs : 1;
 		this.nrDivs = nrDivs;
 		this.patchLength = 1.0 / nrDivs;
@@ -67,5 +66,3 @@ export class MyPlane extends CGFobject {
 	};
 
 }
-
-

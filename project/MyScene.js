@@ -39,7 +39,6 @@ export class MyScene extends CGFscene {
     this.initLights();
     this.initGLSettings();
     this.initTextures();
-    this.initAppearances();
     this.initShaders();
     this.initObjects();
     this.setUpdatePeriod(50);
@@ -69,54 +68,23 @@ export class MyScene extends CGFscene {
     this.trunkTexture = new CGFtexture(this, "textures/trunk.jpg");
     this.canopyTexture = new CGFtexture(this, "textures/tree_crown.jpg");
 
-    // Lake
+    // Terrain and Lake
     this.lakeTexture = new CGFtexture(this, "textures/waterTex.jpg");
-    this.lakeTexture2 = new CGFtexture(this, "textures/waterMap.jpg");
+    this.lakeMap = new CGFtexture(this, "textures/waterMap.jpg");
+    this.terrainMask = new CGFtexture(this, "textures/terrain_lake_mask.png");
+    this.grassTexture = new CGFtexture(this, "textures/grass.jpg");
 
     // Fire
     this.yellowFireTexture = new CGFtexture(this, "textures/yellow_fire.jpg");
     this.orangeFireTexture = new CGFtexture(this, "textures/orange_fire.jpg");
 
-    // Grass
-    this.grassTexture = new CGFtexture(this, "textures/grass.jpg");
-
     // Sky
     this.skyTexture = new CGFtexture(this, "textures/sky.jpg");
   }
 
-  initAppearances() {
-    // Grass
-    this.grassAppearance = new CGFappearance(this);
-    this.grassAppearance.setAmbient(0.3, 0.3, 0.3, 1);
-    this.grassAppearance.setDiffuse(0.7, 0.7, 0.7, 1);
-    this.grassAppearance.setSpecular(0.0, 0.0, 0.0, 1);
-    this.grassAppearance.setShininess(10.0);
-    this.grassAppearance.setTexture(this.grassTexture);
-    this.grassAppearance.setTextureWrap("REPEAT", "REPEAT");
-
-    // Lake
-    this.lakeAppearance = new CGFappearance(this);
-    this.lakeAppearance.setAmbient(0.3, 0.3, 0.3, 1);
-    this.lakeAppearance.setDiffuse(0.7, 0.7, 0.7, 1);
-    this.lakeAppearance.setSpecular(0.0, 0.0, 0.0, 1);
-    this.lakeAppearance.setShininess(120);
-
-    // Fire
-    this.fireAppearances = [
-      new CGFappearance(this),
-      new CGFappearance(this),
-    ];
-    this.fireAppearances[0].setAmbient(1.0, 1.0, 0.2, 1.0);
-    this.fireAppearances[0].setDiffuse(1.0, 1.0, 0.2, 1.0);
-    this.fireAppearances[0].setEmission(1.0, 1.0, 0.2, 1.0);
-    this.fireAppearances[1].setAmbient(1.0, 0.5, 0.1, 1.0);
-    this.fireAppearances[1].setDiffuse(1.0, 0.5, 0.1, 1.0);
-    this.fireAppearances[1].setEmission(1.0, 0.5, 0.1, 1.0);
-  }
-
   initShaders() {
     this.testShaders = [
-      new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag"),
+      new CGFshader(this.gl, "shaders/terrain.vert", "shaders/terrain.frag"),
       new CGFshader(this.gl, "shaders/fire.vert", "shaders/fire.frag"),
     ];
   }
@@ -141,9 +109,7 @@ export class MyScene extends CGFscene {
     );
     this.panorama = new MyPanorama(this, this.skyTexture);
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
-    this.lake = new MyLake(this);
     this.fire = new MyFire(this, 6, 1.5)
-
     this.firePositions = this.generateFirePositions(this.forest, this.minDistance);
   }
 
@@ -343,13 +309,26 @@ export class MyScene extends CGFscene {
 
     this.setDefaultAppearance();
 
-    // Grass terrain
+    // Lake and Terrain using Mask
+    this.setActiveShader(this.testShaders[0]);
+    this.testShaders[0].setUniformsValues({
+        uSampler: 0, // lake texture
+        uSampler1: 1, // waterMap 
+        uSampler2: 2, // terrainMask
+        uSampler3: 3  // grass texture
+    });
+    this.lakeTexture.bind(0);  
+    this.lakeMap.bind(1);       
+    this.terrainMask.bind(2);   
+    this.grassTexture.bind(3); 
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT); 
     this.pushMatrix();
-    this.grassAppearance.apply();
     this.scale(400, 1, 400);
     this.rotate(-Math.PI / 2, 1, 0, 0);
     this.plane.display();
     this.popMatrix();
+    this.setActiveShader(this.defaultShader);
 
     // Panorama sky
     this.pushMatrix();
@@ -380,18 +359,14 @@ export class MyScene extends CGFscene {
             uRandomness: 35 + 5,
         });
         // Yellow fire
-        this.fireAppearances[0].apply(); 
         this.yellowFireTexture.bind(0); 
         this.fire.displayLayer(0);
         // Orange fire
-        this.fireAppearances[1].apply(); 
         this.orangeFireTexture.bind(0); 
         this.fire.displayLayer(1);
         this.popMatrix();
       }
     });
-
-    
     this.setActiveShader(this.defaultShader);
 
     // Helicopter
@@ -400,22 +375,5 @@ export class MyScene extends CGFscene {
     this.scale(0.6,0.6,0.6)
     this.helicopter.display();
     this.popMatrix();
-
-    // Lake
-    this.lakeAppearance.apply();
-    this.setActiveShader(this.testShaders[0]);
-    this.testShaders[0].setUniformsValues({
-        uSampler: 0,    
-        uSampler2: 1,   
-        waterMap: 1    
-    });
-    this.lakeTexture.bind(0);   
-    this.lakeTexture2.bind(1);  
-    this.pushMatrix();
-    this.translate(25, 0.1, 0);
-    this.scale(20, 1, 20);      
-    this.lake.display();
-    this.popMatrix();
-    this.setActiveShader(this.defaultShader); 
   }
 }
