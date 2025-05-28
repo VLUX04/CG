@@ -30,9 +30,7 @@ export class MyScene extends CGFscene {
     this.lakePosition = { x: 25, z: 0 };
     this.lakeSize = { width: 30, depth: 30 }; 
 
-    this.minDistance = 2;
-    this.numFires = 4;
-    this.fires = [];
+    this.minDistance = 1.5;
   }
 
   init(application) {
@@ -144,12 +142,9 @@ export class MyScene extends CGFscene {
     this.panorama = new MyPanorama(this, this.skyTexture);
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
     this.lake = new MyLake(this);
+    this.fire = new MyFire(this, 6, 1.5)
 
-    // Fire positions and objects
-    this.firePositions = this.generateFirePositions(this.forest, this.numFires, this.minDistance);
-    for (let i = 0; i < this.firePositions.length; i++) {
-      this.fires.push(new MyFire(this, 8, 2.5, 0.7));
-    }
+    this.firePositions = this.generateFirePositions(this.forest, this.minDistance);
   }
 
   initLights() {
@@ -169,15 +164,23 @@ export class MyScene extends CGFscene {
     );
   }
 
-  generateFirePositions(forest, numFires, minDistance) {
-    const firePositions = [];
-    const selectedTree = forest.trees[0];
-    for (let i = 0; i < numFires; i++) {
-      const angle = (2 * Math.PI * i) / numFires;
-      const x = selectedTree.x + Math.cos(angle) * minDistance;
-      const z = selectedTree.z + Math.sin(angle) * minDistance;
-
-      firePositions.push([x - 20, 0, z]);
+  generateFirePositions(forest,  minDistance) {
+    const firePositions = new Map();
+    const numTrees = Math.floor(forest.trees.length / 10) + 1;
+    let fireIndices = [];
+    for(let i = 0; i < numTrees; i++) {
+      let indice = (Math.floor(Math.random() * (forest.trees.length-1)));
+      if (!fireIndices.includes(indice)) {
+        fireIndices.push(indice);
+      }
+    }
+    for (let j = 0; j < fireIndices.length; j++) {
+      const treeIndex = fireIndices[j];
+      const tree = forest.trees[treeIndex];
+      const angle = Math.random() * 2 * Math.PI;
+      const x = tree.x + Math.cos(angle) * minDistance;
+      const z = tree.z + Math.sin(angle) * minDistance;
+      firePositions.set([x - 20, 0, z], true);
     }
     return firePositions;
   }
@@ -225,9 +228,29 @@ export class MyScene extends CGFscene {
       h.reset();
     }
     if (pressing("KeyO") && h.hasWater && !h.isDroppingWater) {
-        h.hasWater = false;
-        h.isDroppingWater = true;
-        h.waterDropTime = 0;
+      h.hasWater = false;
+      h.isDroppingWater = true;
+      h.waterDropTime = 0;  
+    }
+
+    if (h.isDroppingWater && h.waterDropProgress >= 0.95) {
+      let eraseFire = false;
+      let positions = [];
+
+      this.firePositions.forEach((flag, pos) => {
+        if (this.isInsideCircle(h.x * 0.6, h.z * 0.6 - 39, pos[0], pos[2], 3) && flag) {
+          positions.push(pos);
+          eraseFire = true;
+        }
+      });
+
+      if (eraseFire && positions.length > 0) {
+        for (let i = 0; i < positions.length; i++) {
+          this.firePositions.set(positions[i], false);
+        }
+        h.isDroppingWater = false; 
+        h.waterDropTime = 0;      
+      }
     }
 
     if (moved) {
@@ -236,6 +259,11 @@ export class MyScene extends CGFscene {
       h.inclination = 0;
     }
   }
+
+  isInsideCircle(x, y, cx, cy, radius) {
+      return ((x - cx) * (x - cx) + (y - cy) * (y - cy)) <= radius * radius;
+  }
+
 
   updateBuilding() {
     this.building = new MyBuilding(
@@ -294,7 +322,8 @@ export class MyScene extends CGFscene {
 
   updateForest() {
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
-    this.firePositions = this.generateFirePositions(this.forest, this.numFires, this.minDistance);
+    this.firePositions = this.generateFirePositions(this.forest, this.minDistance);
+
   }
 
   setDefaultAppearance() {
@@ -341,24 +370,28 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
     // Fires
-    for (let i = 0; i < this.fires.length; i++) {
-      this.pushMatrix();
-      this.translate(...this.firePositions[i]);
-      this.setActiveShader(this.testShaders[1]);
-      this.testShaders[1].setUniformsValues({
-          uTime: performance.now() / 1000.0,
-          uRandomness: 35 + i * 5,
-      });
-      // Yellow fire
-      this.fireAppearances[0].apply(); 
-      this.yellowFireTexture.bind(0); 
-      this.fires[i].displayLayer(0);
-      // Orange fire
-      this.fireAppearances[1].apply(); 
-      this.orangeFireTexture.bind(0); 
-      this.fires[i].displayLayer(1);
-      this.popMatrix();
-    }
+    this.firePositions.forEach((flag, pos) => {
+      if(flag){
+        this.pushMatrix();
+        this.translate(...pos);
+        this.setActiveShader(this.testShaders[1]);
+        this.testShaders[1].setUniformsValues({
+            uTime: performance.now() / 1000.0,
+            uRandomness: 35 + 5,
+        });
+        // Yellow fire
+        this.fireAppearances[0].apply(); 
+        this.yellowFireTexture.bind(0); 
+        this.fire.displayLayer(0);
+        // Orange fire
+        this.fireAppearances[1].apply(); 
+        this.orangeFireTexture.bind(0); 
+        this.fire.displayLayer(1);
+        this.popMatrix();
+      }
+    });
+
+    
     this.setActiveShader(this.defaultShader);
 
     // Helicopter

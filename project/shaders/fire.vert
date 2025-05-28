@@ -9,14 +9,15 @@ uniform float uRandomness;
 varying vec2 vTextureCoord;
 
 void main(void) {
-    float verticalWave = sin(uTime * 3.0 + aVertexPosition.x * 5.0 + uRandomness * 10.0) * 0.1;
+    // Only apply wave to vertices above the base
+    float waveFactor = aVertexPosition.y > 0.0 ? 1.0 : 0.0;
 
-    float horizontalWaveX = sin(uTime * 2.0 + aVertexPosition.z * 4.0 + uRandomness * 5.0) * 0.1;
-    float horizontalWaveZ = cos(uTime * 2.5 + aVertexPosition.x * 3.0 + uRandomness * 7.0) * 0.1;
+    // Multiple sine-based waves for wiggling edges
+    float waveX = sin(uTime * 5.0 + aVertexPosition.y * 40.0 + aVertexPosition.x * 15.0 + uRandomness * 10.0) * 0.12;
+    float waveZ = cos(uTime * 6.0 + aVertexPosition.y * 30.0 + aVertexPosition.z * 18.0 + uRandomness * 8.0) * 0.1;
 
-    vec3 displacedPosition = aVertexPosition + vec3(horizontalWaveX, verticalWave, horizontalWaveZ);
+    vec3 displaced = aVertexPosition + waveFactor * vec3(waveX, 0.0, waveZ);
 
-    gl_Position = uPMatrix * uMVMatrix * vec4(displacedPosition, 1.0);
-
+    gl_Position = uPMatrix * uMVMatrix * vec4(displaced, 1.0);
     vTextureCoord = aTextureCoord;
 }

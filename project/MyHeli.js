@@ -35,7 +35,7 @@ export class MyHeli extends CGFobject {
         this.vz = 0;
         this.acceleration = 0.1;
         this.friction = 0.9;
-        this.maxSpeed = 3;
+        this.maxSpeed = 10;
 
         this.line = false;
         this.isAtRest = true;
@@ -70,10 +70,10 @@ export class MyHeli extends CGFobject {
         this.bucketMaterial.setShininess(50.0);
 
         this.waterMaterial = new CGFappearance(scene);
-        this.waterMaterial.setAmbient(0.1, 0.1, 0.5, 1);
-        this.waterMaterial.setDiffuse(0.3, 0.3, 0.9, 1);
+        this.waterMaterial.setAmbient(0.2, 0.2, 0.5, 1);
+        this.waterMaterial.setDiffuse(0.4, 0.4, 0.9, 1);
         this.waterMaterial.setSpecular(0.5, 0.5, 1.0, 1);
-        this.waterMaterial.setShininess(50.0);
+        this.waterMaterial.setShininess(120.0);
 
         this.body = new MySphere(scene, 16, 16);
         this.rotorCenter = new MyCylinder(scene, 16, 16);
@@ -107,7 +107,7 @@ export class MyHeli extends CGFobject {
             }
         }
 
-        this.line = !this.isAtRest && !this.heliLifting && !(this.heliGoingHome && this.x < 0.5 && this.z < 0.5 && this.x > -0.5 && this.z > -0.5 && this.orientation < 0.1 && this.orientation > -0.1);
+        this.line = !this.isAtRest && (!this.heliLifting || this.hasWater) && !(this.heliGoingHome && this.x < 0.5 && this.z < 0.5 && this.x > -0.5 && this.z > -0.5 && this.orientation < 0.1 && this.orientation > -0.1);
 
         if (this.line) {
             this.bucketLiftProgress = Math.min(1, this.bucketLiftProgress + this.bucketLiftSpeed);
@@ -291,34 +291,40 @@ export class MyHeli extends CGFobject {
         }
 
         if (this.isDroppingWater) {
-            const numParticles = 30;
-            const emissionDuration = 0.7; 
+            const numParticles = 50;
+            const emissionDuration = 0.4;
+
             this.scene.pushMatrix();
-            this.scene.translate(0,-6, 0); 
+            this.scene.translate(0, -6, 0);
+
             for (let i = 0; i < numParticles; i++) {
                 const particleStart = (i / numParticles) * emissionDuration;
                 const dropProgress = (this.waterDropProgress - particleStart) / (1 - particleStart);
-                if (dropProgress < 0 || dropProgress > 1) continue; 
+                if (dropProgress < 0 || dropProgress > 1) continue;
+
+                function pseudoRandom(seed) {
+                    return Math.abs(Math.sin(seed) * 43758.5453) % 1;
+                }
+
+                const angle = pseudoRandom(i * 43.23) * 2 * Math.PI;
+                const lateralSpread = pseudoRandom(i * 92.3) * 3;
+
+                const xOffset = Math.cos(angle) * lateralSpread * dropProgress;
+                const zOffset = Math.sin(angle) * lateralSpread * dropProgress;
+                const yOffset = -40 * dropProgress + 7 * Math.sin(dropProgress * Math.PI);
 
                 this.scene.pushMatrix();
-                function pseudoRandom(seed) {
-                    return Math.abs(Math.sin(seed) * 10000) % 1;
-                }
-                const angle = ((i / numParticles) - 0.5) * Math.PI * 0.7;
-                const radius = 0.7 + pseudoRandom(i * 9973) * 0.7;
-                const xOffset = Math.sin(angle) * radius * 1.2;
-                const zOffset = Math.cos(angle) * radius * 0.8;
-                const dropY = -40 * dropProgress;
-                this.scene.translate(0, dropY, 0);
-                this.scene.scale(0.3 * (1 - dropProgress), 0.12 * (1 - dropProgress), 0.3 * (1 - dropProgress));
+                this.scene.translate(xOffset, yOffset, zOffset);
+                this.scene.scale(0.2 * (1 + dropProgress), 0.08 * (1 + dropProgress), 0.2 * (1 + dropProgress));
+
                 this.waterMaterial.apply();
-                this.scene.sphereDrop = this.scene.sphereDrop || new MySphere(this.scene, 10, 10);
-                this.scene.sphereDrop.display();
+                this.body.display();
                 this.scene.popMatrix();
             }
+
             this.scene.popMatrix();
-            
         }
+
 
         this.makeLandingGear();
 
