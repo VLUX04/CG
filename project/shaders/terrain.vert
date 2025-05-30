@@ -17,7 +17,7 @@ void main() {
     float mask = texture2D(uSampler2, aTextureCoord / 10.0).r;
     vec3 offset = vec3(0.0);
 
-    if (mask < 0.5) { // water area
+    if (mask == 0.0) { // water area
         float waterHeight = texture2D(uSampler1, aTextureCoord + vec2(0.01 * timeFactor)).b;
         offset = aVertexNormal * 0.1 * waterHeight;
     }
