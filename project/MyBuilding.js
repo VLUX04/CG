@@ -44,13 +44,16 @@ export class MyBuilding extends CGFobject {
         this.heliportTextureDOWN = new CGFappearance(scene);
         this.heliportTextureDOWN.setTexture(heliportTextureDOWN);
 
-        this.currentHeliportTexture = this.heliportTextureH;
+        this.heliportTextureBase = heliportTextureH;
+        this.heliportTextureUp = heliportTextureUP;
+        this.heliportTextureDown = heliportTextureDOWN;
+        this.currentHeliportTargetTexture = heliportTextureH;
     }
 
     setHeliportTexture(mode) {
-        if (mode === "UP") this.currentHeliportTexture = this.heliportTextureUP;
-        else if (mode === "DOWN") this.currentHeliportTexture = this.heliportTextureDOWN;
-        else this.currentHeliportTexture = this.heliportTextureH;
+        if (mode === "UP") this.currentHeliportTargetTexture = this.heliportTextureUp;
+        else if (mode === "DOWN") this.currentHeliportTargetTexture = this.heliportTextureDown;
+        else this.currentHeliportTargetTexture = this.heliportTextureBase;
     }
 
     drawHeliportSign(floors) {
@@ -59,8 +62,20 @@ export class MyBuilding extends CGFobject {
         this.scene.rotate(-Math.PI / 2, 1, 0, 0);
         const heliportSize = Math.min(this.centralWidth, this.depth * 1.25);
         this.scene.scale(heliportSize, heliportSize, 1);
-        this.currentHeliportTexture.apply();
+
+        // Activate shader
+        this.scene.setActiveShader(this.scene.heliportShader);
+
+        // Bind textures
+        this.heliportTextureBase.bind(0);
+        this.currentHeliportTargetTexture.bind(1);
+
+        // Draw quad
         this.heliportQuad.display();
+
+        // Restore default shader
+        this.scene.setActiveShader(this.scene.defaultShader);
+
         this.scene.popMatrix();
         this.drawHeliportLights(heliportSize, floors);
     }
@@ -101,6 +116,7 @@ export class MyBuilding extends CGFobject {
             this.scene.popMatrix();
         }
     }
+    
     display() {
         this.scene.pushMatrix();
         this.scene.translate(-this.centralWidth / 2 - this.sideWidth/2, 0, 0);

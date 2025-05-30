@@ -4,7 +4,6 @@ import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
 import { MyForest } from "./MyForest.js";
 import { MyHeli } from "./MyHeli.js";
-import { MyLake } from "./MyLake.js";
 import { MyFire } from "./MyFire.js";
 
 /**
@@ -87,6 +86,9 @@ export class MyScene extends CGFscene {
       new CGFshader(this.gl, "shaders/terrain.vert", "shaders/terrain.frag"),
       new CGFshader(this.gl, "shaders/fire.vert", "shaders/fire.frag"),
     ];
+    this.heliportShader = new CGFshader(this.gl, "shaders/heliport.vert", "shaders/heliport.frag");
+    this.heliportShader.setUniformsValues({ blendFactor: 0.0 });
+    this.heliportShader.setUniformsValues({ uTexture1: 0, uTexture2: 1 });
   }
 
   initObjects() {
@@ -182,7 +184,7 @@ export class MyScene extends CGFscene {
       moved = true;
     }
 
-    if (pressing("KeyL") && !h.heliGettingWater) {
+    if (pressing("KeyL") && !h.heliGettingWater && !h.isAtRest) {
       if (h.isHeliAboveLake() && !h.hasWater) {
         h.heliGettingWater = true;
       } else if (!h.hasWater) {
@@ -258,15 +260,30 @@ export class MyScene extends CGFscene {
         this.helicopter.updateHelice();
     }
 
-    let blink = Math.floor((t / 250) % 2) === 0;
     const heli = this.helicopter;
+    if (this.heliportBlend === undefined) this.heliportBlend = 0;
+
+    let transitioning = false;
     if (heli.heliLifting && heli.x < 0.5 && heli.z < 0.5) {
-        this.building.setHeliportTexture(blink ? "H" : "UP");
+      this.heliportTargetTex = this.heliportTextureUP;
+      transitioning = true;
     } else if (heli.heliGoingHome && heli.x < 0.5 && heli.z < 0.5 && heli.orientation < 0.05) {
-        this.building.setHeliportTexture(blink ? "H" : "DOWN");
+      this.heliportTargetTex = this.heliportTextureDOWN;
+      transitioning = true;
     } else {
-        this.building.setHeliportTexture("H");
+      this.heliportTargetTex = this.heliportTextureH;
     }
+    if (transitioning) {
+      this.heliportBlend = (Math.floor(t / 250) % 2 === 0) ? 1.0 : 0.0;
+    } else {
+      this.heliportBlend = 0.0;
+    }
+    this.building.setHeliportTexture(
+        heli.heliLifting ? "UP" : 
+        (heli.heliGoingHome && heli.orientation < 0.05 ? "DOWN" : "H")
+    );
+
+    this.heliportShader.setUniformsValues({ blendFactor: this.heliportBlend });
 
     const isBlinking = (heli.heliLifting || heli.heliGoingHome) && heli.x < 0.5 && heli.z < 0.5 ;
     if (isBlinking) {
