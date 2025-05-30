@@ -265,20 +265,17 @@ export class MyScene extends CGFscene {
     const heli = this.helicopter;
     if (this.heliportBlend === undefined) this.heliportBlend = 0;
 
-    let transitioning = false;
+    
     if (heli.heliLifting && heli.x < 0.5 && heli.z < 0.5) {
-      transitioning = true;
-    } else if (heli.heliGoingHome && heli.x < 0.5 && heli.z < 0.5 && heli.orientation < 0.05) {
-      transitioning = true;
-    } 
-    if (transitioning) {
       this.heliportBlend = (Math.floor(t / 250) % 2 === 0) ? 1.0 : 0.0;
-    } else {
-      this.heliportBlend = 0.0;
-    }
+    } else if (heli.heliGoingHome && heli.x < 0.5 && heli.z < 0.5 && heli.orientation < 0.05) {
+      this.heliportBlend = (Math.floor(t / 250) % 2 === 0) ? 1.0 : 0.0;
+    } 
+    else this.heliportBlend = 0.0;
+
     this.building.setHeliportTexture(
-      heli.heliLifting ? "UP" : 
-      (heli.heliGoingHome && heli.orientation < 0.05 ? "DOWN" : "H")
+        heli.heliLifting ? "UP" : 
+        (heli.heliGoingHome && heli.orientation < 0.05 ? "DOWN" : "H")
     );
 
     this.heliportShader.setUniformsValues({ blendFactor: this.heliportBlend });
