@@ -89,7 +89,6 @@ export class MyBuilding extends CGFobject {
             this.scene.setActiveShader(this.scene.blinkingLightShader);
             this.scene.blinkingLightShader.setUniformsValues({
                 uTime: performance.now() / 1000.0,
-                uColor: [1.0, 1.0, 0.0]  // Yellow lights when blinking
             });
         } 
 
