@@ -190,22 +190,26 @@ export class MyHeli extends CGFobject {
         this.heliLifting = false;
         this.heliGoingHome = false;
         this.heliGettingWater = false;
+        this.isDroppingWater = false;
+        this.waterDropTime = 0;
+        this.waterDropProgress = 0;
+        this.bucketLiftProgress = 0;
     }
 
-    acelerate(x, auto) {
+    acelerate(flag, auto) {
         if (auto) {
-            this.x += (this.speed * Math.sin(this.orientation)) * x;
-            this.z += (this.speed * Math.cos(this.orientation)) * x;
-            this.inclination = 0.1 * x;
+            this.x += (this.speed * Math.sin(this.orientation)) * flag;
+            this.z += (this.speed * Math.cos(this.orientation)) * flag;
+            this.inclination = 0.1 * flag;
         } else {
-            this.vx += this.acceleration * Math.sin(this.orientation) * x * this.scene.speedFactor;
-            this.vz += this.acceleration * Math.cos(this.orientation) * x * this.scene.speedFactor;
-            this.inclination = 0.1 * x;
+            this.vx += this.acceleration * Math.sin(this.orientation) * flag * this.scene.speedFactor;
+            this.vz += this.acceleration * Math.cos(this.orientation) * flag * this.scene.speedFactor;
+            this.inclination = 0.1 * flag;
         }
     }
 
-    rotate(x, auto) {
-        this.orientation += (0.05 * (auto ? 1 : this.scene.speedFactor)) * x;
+    rotate(flag, auto) {
+        this.orientation += (0.05 * (auto ? 1 : this.scene.speedFactor)) * flag;
     }
 
     display() {
