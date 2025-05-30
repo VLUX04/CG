@@ -44,6 +44,9 @@ export class MyHeli extends CGFobject {
         this.heliGoingHome = false;
         this.heliGettingWater = false;
         this.isDroppingWater = false;
+        this.startingLift = false;
+        this.stopping = false;
+        this.heliceFactor = 0;
 
         this.bodyMaterial = new CGFappearance(scene);
         this.bodyMaterial.setAmbient(0.5, 0.1, 0.1, 1);  
@@ -89,6 +92,22 @@ export class MyHeli extends CGFobject {
         if (this.y != this.heliportHeight && this.isAtRest) {
             this.y = this.heliportHeight;
         }
+
+        if (this.startingLift && this.heliceFactor < 1) {
+            this.heliceFactor += 0.05;
+            if (this.heliceFactor >= 1) {
+                this.heliceFactor = 1;
+                this.startingLift = false;
+            }
+        }
+
+        if(this.stopping && this.heliceFactor > 0) {
+            this.heliceFactor -= 0.05;
+            if (this.heliceFactor <= 0) {
+                this.heliceFactor = 0;
+                this.stopping = false;
+            }
+        }
         
         if (this.isDroppingWater) {
             this.waterDropTime++;
@@ -99,7 +118,7 @@ export class MyHeli extends CGFobject {
                 this.waterDropProgress = 0;
             }
         }
-        if (this.heliLifting) {
+        if (this.heliLifting && this.heliceFactor == 1) {
             if (this.y < 25) {
                 this.y += this.speed / 2;
             } else {
@@ -141,6 +160,7 @@ export class MyHeli extends CGFobject {
                 } else if (this.y > this.heliportHeight && this.bucketLiftProgress < 0.01) {
                     this.y -= this.speed / 2;
                 } else if (this.bucketLiftProgress < 0.01) {
+                    this.stopping = true;
                     this.isAtRest = true;
                     this.heliGoingHome = false;
                 }
@@ -171,8 +191,8 @@ export class MyHeli extends CGFobject {
     }
 
     updateHelice() {
-        this.mainRotorAngle += 6 ; 
-        this.tailRotorAngle += 8 ;
+        this.mainRotorAngle += 6 * this.heliceFactor; 
+        this.tailRotorAngle += 8 * this.heliceFactor;
 
         this.mainRotorAngle %= 2 * Math.PI;
         this.tailRotorAngle %= 2 * Math.PI;
@@ -194,6 +214,9 @@ export class MyHeli extends CGFobject {
         this.waterDropTime = 0;
         this.waterDropProgress = 0;
         this.bucketLiftProgress = 0;
+        this.startingLift = false;
+        this.stopping = false;
+        this.heliceFactor = 0;
     }
 
     acelerate(flag, auto) {
