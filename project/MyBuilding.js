@@ -63,34 +63,19 @@ export class MyBuilding extends CGFobject {
         const heliportSize = Math.min(this.centralWidth, this.depth * 1.25);
         this.scene.scale(heliportSize, heliportSize, 1);
 
-        // Activate shader
         this.scene.setActiveShader(this.scene.heliportShader);
-
-        // Bind textures
         this.heliportTextureBase.bind(0);
         this.currentHeliportTargetTexture.bind(1);
-
-        // Draw quad
         this.heliportQuad.display();
-
-        // Restore default shader
         this.scene.setActiveShader(this.scene.defaultShader);
 
         this.scene.popMatrix();
-        this.drawHeliportLights(heliportSize, floors);
+        
+        const blinking = this.scene.isBlinking ?? false;
+        this.drawHeliportLights(heliportSize, floors, blinking);
     }
 
-    drawHeliportLights(heliportSize, floors) {
-        const emission = this.scene.heliportLightEmission || [0, 0, 0, 1];
-        if (!this.heliportLightMaterial) {
-            this.heliportLightMaterial = new CGFappearance(this.scene);
-            this.heliportLightMaterial.setAmbient(0.1, 0.1, 0.1, 1);
-            this.heliportLightMaterial.setDiffuse(0.1, 0.1, 0.1, 1);
-            this.heliportLightMaterial.setSpecular(0.1, 0.1, 0.1, 1);
-            this.heliportLightMaterial.setShininess(10.0);
-        }
-        this.heliportLightMaterial.setEmission(...emission);
-
+    drawHeliportLights(heliportSize, floors, isBlinking) {
         const r = heliportSize / 2 * 0.9;
         const y = floors + 0.25 + 0.01;
         const positions = [
@@ -99,14 +84,28 @@ export class MyBuilding extends CGFobject {
             [ r, y, -r],
             [-r, y, -r]
         ];
+
+        if (isBlinking) {
+            this.scene.setActiveShader(this.scene.blinkingLightShader);
+            this.scene.blinkingLightShader.setUniformsValues({
+                uTime: performance.now() / 1000.0,
+                uColor: [1.0, 1.0, 0.0]  // Yellow lights when blinking
+            });
+        } 
+
         for (const [x, y, z] of positions) {
             this.scene.pushMatrix();
             this.scene.translate(x, y, z);
             this.scene.scale(0.13, 0.13, 0.13);
-            this.heliportLightMaterial.apply();
+            this.baseLightMaterial.apply();
             this.sphere.display();
             this.scene.popMatrix();
         }
+
+        if (isBlinking) {
+            this.scene.setActiveShader(this.scene.defaultShader);
+        }
+
         for (const [x, y, z] of positions) {
             this.scene.pushMatrix();
             this.scene.translate(x, y, z);

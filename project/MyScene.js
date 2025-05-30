@@ -1,4 +1,4 @@
-import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture, CGFshader} from "../lib/CGF.js";
+import { CGFscene, CGFcamera, CGFaxis, CGFtexture, CGFshader} from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyBuilding } from "./MyBuilding.js";
@@ -87,8 +87,7 @@ export class MyScene extends CGFscene {
       new CGFshader(this.gl, "shaders/fire.vert", "shaders/fire.frag"),
     ];
     this.heliportShader = new CGFshader(this.gl, "shaders/heliport.vert", "shaders/heliport.frag");
-    this.heliportShader.setUniformsValues({ blendFactor: 0.0 });
-    this.heliportShader.setUniformsValues({ uTexture1: 0, uTexture2: 1 });
+    this.blinkingLightShader = new CGFshader(this.gl, "shaders/heliportLight.vert", "shaders/heliportLight.frag");
   }
 
   initObjects() {
@@ -181,6 +180,7 @@ export class MyScene extends CGFscene {
 
     if (pressing("KeyP") && !h.heliGettingWater) {
       h.heliLifting = true;
+      h.startingLift = true;
       moved = true;
     }
 
@@ -234,7 +234,6 @@ export class MyScene extends CGFscene {
       return ((x - cx) * (x - cx) + (y - cy) * (y - cy)) <= radius * radius;
   }
 
-
   updateBuilding() {
     this.building = new MyBuilding(
       this,
@@ -257,19 +256,15 @@ export class MyScene extends CGFscene {
   update(t) {
     this.testShaders[0].setUniformsValues({ timeFactor: t / 100 % 100 });
     this.checkKeys();
-    if (!this.helicopter.isAtRest) {
-      this.helicopter.update();
-      this.helicopter.updateHelice();
-    }
-
+    this.helicopter.update();
+    this.helicopter.updateHelice();
     const heli = this.helicopter;
     if (this.heliportBlend === undefined) this.heliportBlend = 0;
 
-    
     if (heli.heliLifting && heli.x < 0.5 && heli.z < 0.5) {
-      this.heliportBlend = (Math.floor(t / 250) % 2 === 0) ? 1.0 : 0.0;
+      this.heliportBlend = (Math.floor(t / 400) % 2 === 0) ? 1.0 : 0.0;
     } else if (heli.heliGoingHome && heli.x < 0.5 && heli.z < 0.5 && heli.orientation < 0.05) {
-      this.heliportBlend = (Math.floor(t / 250) % 2 === 0) ? 1.0 : 0.0;
+      this.heliportBlend = (Math.floor(t / 350) % 2 === 0) ? 1.0 : 0.0;
     } 
     else this.heliportBlend = 0.0;
 
@@ -278,16 +273,10 @@ export class MyScene extends CGFscene {
         (heli.heliGoingHome && heli.orientation < 0.05 ? "DOWN" : "H")
     );
 
-    this.heliportShader.setUniformsValues({ blendFactor: this.heliportBlend });
+    this.isBlinking = (heli.heliLifting || heli.heliGoingHome) && heli.x < 0.5 && heli.z < 0.5;
 
-    const isBlinking = (heli.heliLifting || heli.heliGoingHome) && heli.x < 0.5 && heli.z < 0.5 ;
-    if (isBlinking) {
-      const pulse = 0.5 + 0.5 * Math.sin(t / 200);
-      this.heliportLightEmission = [pulse, pulse, 0, 1];
-    } else {
-      this.heliportLightEmission = [1, 1, 0, 1]; 
-    }
-
+    this.heliportShader.setUniformsValues({ blendFactor: this.heliportBlend, uTexture1: 0, uTexture2: 1 });
+    this.blinkingLightShader.setUniformsValues({ uBlink: this.heliportBlend, uColor: [1.0, 1.0, 0.0] }); 
 
     const minCameraHeight = 2;
     if (this.camera.position[1] < minCameraHeight) {
