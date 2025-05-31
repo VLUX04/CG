@@ -5,11 +5,11 @@ import { MyQuad } from "./MyQuad.js";
 import { MySphere } from "./MySphere.js"; 
 
 export class MyBuilding extends CGFobject {
-    constructor(scene, centralWidth, sideWidthPerc, numFloors, numWindows, buildingColor,windowTexture, letreiroTexture, doorTexture, heliportTextureH, heliportTextureUP, heliportTextureDOWN) {
+    constructor(scene, width, numFloors, numWindows, buildingColor,windowTexture, letreiroTexture, doorTexture, heliportTextureH, heliportTextureUP, heliportTextureDOWN) {
         super(scene);
         this.sphere = new MySphere(scene, 10, 10);
-        this.centralWidth = centralWidth;
-        this.sideWidth = Math.min(centralWidth * sideWidthPerc, 15);
+        this.centralWidth = width / 3;
+        this.sideWidth = Math.min(this.centralWidth * 0.75, 15);
         this.numFloors = numFloors;
         this.numWindows = numWindows;
         this.window = new MyWindow(scene, windowTexture);
@@ -27,7 +27,7 @@ export class MyBuilding extends CGFobject {
         this.baseLightMaterial.setDiffuse(0, 0, 0, 1);
         this.baseLightMaterial.setShininess(10.0);
 
-        this.depth = this.centralWidth * 0.75;
+        this.depth = (this.centralWidth + 2.5) * 0.5;
 
         this.boxLeft = new MyBox(scene, { left: true, right: false, bottom: false });
         this.boxCenter = new MyBox(scene, { left: true, right: true, bottom: false });

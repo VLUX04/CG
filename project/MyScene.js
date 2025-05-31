@@ -13,8 +13,7 @@ import { MyFire } from "./MyFire.js";
 export class MyScene extends CGFscene {
   constructor() {
     super();
-    this.centralWidth = 5;
-    this.sideWidthPerc = 0.75; 
+    this.width = 15;
     this.numFloors = 3;
     this.numWindows = 2;
 
@@ -96,8 +95,7 @@ export class MyScene extends CGFscene {
     this.helicopter = new MyHeli(this);
     this.building = new MyBuilding(
       this, 
-      this.centralWidth, 
-      this.sideWidthPerc, 
+      this.width, 
       this.numFloors, 
       this.numWindows,
       [1, 1, 1], 
@@ -237,8 +235,7 @@ export class MyScene extends CGFscene {
   updateBuilding() {
     this.building = new MyBuilding(
       this,
-      this.centralWidth,
-      this.sideWidthPerc,
+      this.width,
       this.numFloors,
       this.numWindows,
       [1, 1, 1],
@@ -282,9 +279,17 @@ export class MyScene extends CGFscene {
     if (this.camera.position[1] < minCameraHeight) {
       this.camera.position[1] = minCameraHeight;
     }
-    const planeSize = 200; 
-    this.camera.position[0] = Math.max(-planeSize, Math.min(planeSize, this.camera.position[0])); 
-    this.camera.position[2] = Math.max(-planeSize, Math.min(planeSize, this.camera.position[2]));
+
+    const maxDistance = 100;
+    const pos = this.camera.position;
+    const distance = Math.sqrt(pos[0] ** 2 + pos[1] ** 2 + pos[2] ** 2);
+
+    if (distance > maxDistance) {
+      const scale = maxDistance / distance;
+      pos[0] *= scale;
+      pos[1] *= scale;
+      pos[2] *= scale;
+    }
   }
 
   updateForest() {

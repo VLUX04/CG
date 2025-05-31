@@ -126,7 +126,7 @@ export class MyHeli extends CGFobject {
             }
         }
 
-        this.line = !this.isAtRest && (!this.heliLifting || this.hasWater) && !(this.heliGoingHome && this.x < 0.5 && this.z < 0.5 && this.x > -0.5 && this.z > -0.5 && this.orientation < 0.1 && this.orientation > -0.1);
+        this.line = !this.isAtRest && (!this.heliLifting || this.hasWater) && !(this.heliGoingHome && this.x < 0.5 && this.z < 0.5 && this.x > -0.5 && this.z > -0.5);
 
         if (this.line) {
             this.bucketLiftProgress = Math.min(1, this.bucketLiftProgress + this.bucketLiftSpeed);

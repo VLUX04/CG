@@ -24,10 +24,9 @@ export class MyInterface extends CGFinterface {
 
         
         const buildingFolder = this.gui.addFolder("Building Controls");
-        buildingFolder.add(this.scene, "centralWidth", 5, 7.5, 0.1).name("Central Width").onChange(() => this.scene.updateBuilding());
-        buildingFolder.add(this.scene, "sideWidthPerc", 0.75, 1.5, 0.05).name("Side Width %").onChange(() => this.scene.updateBuilding());
-        buildingFolder.add(this.scene, "numFloors", 3, 6, 1).name("Floors").onChange(() => this.scene.updateBuilding());
-        buildingFolder.add(this.scene, "numWindows", 2, 4, 1).name("Windows").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "width", 15, 30, 0.1).name("Building Width").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "numFloors", 3, 7, 1).name("Floors").onChange(() => this.scene.updateBuilding());
+        buildingFolder.add(this.scene, "numWindows", 2, 5, 1).name("Windows").onChange(() => this.scene.updateBuilding());
 
         const forestFolder = this.gui.addFolder("Forest Controls");
         forestFolder.add(this.scene, "forestRows", 1, 10, 1).name("Rows").onChange(() => this.scene.updateForest());
