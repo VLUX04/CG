@@ -16,7 +16,6 @@ export class MyBuilding extends CGFobject {
         this.letreiro = new MyWindow(scene, letreiroTexture);
         this.door = new MyWindow(scene, doorTexture);
 
-
         this.buildingMaterial = new CGFappearance(scene);
         this.buildingMaterial.setAmbient(buildingColor[0], buildingColor[1], buildingColor[2], 0.5);
         this.buildingMaterial.setDiffuse(buildingColor[0], buildingColor[1], buildingColor[2], 1);
@@ -133,7 +132,6 @@ export class MyBuilding extends CGFobject {
     }
 
     drawModule(floors, isCentral = false, isLeft = false) {
-
         const box = isCentral ? this.boxCenter : (isLeft ? this.boxLeft : this.boxRight);
 
         this.scene.pushMatrix();

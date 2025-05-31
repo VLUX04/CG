@@ -1,16 +1,7 @@
 import {CGFobject} from '../lib/CGF.js';
-/**
-* MyPlane
-* @constructor
- * @param scene - Reference to MyScene object
- * @param nDivs - number of divisions in both directions of the surface
- * @param minS - minimum texture coordinate in S
- * @param maxS - maximum texture coordinate in S
- * @param minT - minimum texture coordinate in T
- * @param maxT - maximum texture coordinate in T
-*/
+
 export class MyPlane extends CGFobject {
-	constructor(scene, nrDivs, minS, maxS, minT, maxT) {
+	constructor(scene, nrDivs) {
 		super(scene);
 		nrDivs = typeof nrDivs !== 'undefined' ? nrDivs : 1;
 		this.nrDivs = nrDivs;
@@ -60,8 +51,7 @@ export class MyPlane extends CGFobject {
 		this.primitiveType=this.scene.gl.TRIANGLE_STRIP;
 	}
 
-	setLineMode() 
-	{ 
+	setLineMode() { 
 		this.primitiveType=this.scene.gl.LINES;
 	};
 

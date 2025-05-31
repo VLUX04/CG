@@ -197,7 +197,7 @@ export class MyScene extends CGFscene {
     }
     if (pressing("KeyO") && h.hasWater && !h.isDroppingWater && !h.heliLifting && h.vx < 0.1 && h.vz < 0.1 && h.vx > -0.1 && h.vz > -0.1) {
       this.firePositions.forEach((flag, pos) => {
-        if (this.isInsideCircle(h.x * 0.6, h.z * 0.6 - 39, pos[0], pos[2], 4) && flag) {
+        if (this.isInsideCircle(h.x * 0.6, h.z * 0.6 - 39, pos[0], pos[2], 3) && flag) {
           h.hasWater = false;
           h.isDroppingWater = true;
           h.waterDropTime = 0;  
@@ -235,7 +235,7 @@ export class MyScene extends CGFscene {
   }
 
   isInsideCircle(x, y, cx, cy, radius) {
-      return ((x - cx) * (x - cx) + (y - cy) * (y - cy)) <= radius * radius;
+    return ((x - cx) * (x - cx) + (y - cy) * (y - cy)) <= radius * radius;
   }
 
   updateBuilding() {

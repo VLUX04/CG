@@ -21,7 +21,6 @@ export class MyInterface extends CGFinterface {
 
         const heliFolder = this.gui.addFolder("Helicopter Controls");
         heliFolder.add(this.scene, "speedFactor", 0.1, 3).name("Speed Factor");
-
         
         const buildingFolder = this.gui.addFolder("Building Controls");
         buildingFolder.add(this.scene, "width", 15, 30, 0.1).name("Building Width").onChange(() => this.scene.updateBuilding());
@@ -33,7 +32,6 @@ export class MyInterface extends CGFinterface {
         forestFolder.add(this.scene, "forestCols", 1, 10, 1).name("Columns").onChange(() => this.scene.updateForest());
         forestFolder.add(this.scene, "forestWidth", 30, 50, 1).name("Width").onChange(() => this.scene.updateForest());
         forestFolder.add(this.scene, "forestHeight", 30, 50, 1).name("Height").onChange(() => this.scene.updateForest());
-
 
         return true;
     }

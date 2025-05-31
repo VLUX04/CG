@@ -418,7 +418,6 @@ export class MyHeli extends CGFobject {
     }
 
     isHeliAboveLake() {
-
         const renderOffsetX = 0;
         const renderOffsetZ = -39;
         const renderScale = 0.6;
@@ -433,39 +432,39 @@ export class MyHeli extends CGFobject {
         const segments = 100;
 
         function noise(angle) {
-        return (
-            0.3 *
-            (Math.sin(3 * angle) +
-            0.5 * Math.sin(5.7 * angle + 1.2) +
-            0.3 * Math.cos(2.2 * angle - 0.7))
-        );
+            return (
+                0.3 *
+                (Math.sin(3 * angle) +
+                0.5 * Math.sin(5.7 * angle + 1.2) +
+                0.3 * Math.cos(2.2 * angle - 0.7))
+            );
         }
 
         const polygon = [];
 
         for (let i = 0; i <= segments; i++) {
-        const angle = (2 * Math.PI * i) / segments;
+            const angle = (2 * Math.PI * i) / segments;
 
-        const distortion = noise(angle);
-        const radius = baseRadius + distortion;
+            const distortion = noise(angle);
+            const radius = baseRadius + distortion;
 
-        const x = lakeCenter.x + lakeScaleX * radius * Math.cos(angle);
-        const z = lakeCenter.z + lakeScaleZ *  radius * Math.sin(angle);
-        polygon.push([x, z]);
+            const x = lakeCenter.x + lakeScaleX * radius * Math.cos(angle);
+            const z = lakeCenter.z + lakeScaleZ *  radius * Math.sin(angle);
+            polygon.push([x, z]);
         }
 
         function pointInPolygon(x, z, polygon) {
-        let inside = false;
-        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-            const xi = polygon[i][0], zi = polygon[i][1];
-            const xj = polygon[j][0], zj = polygon[j][1];
+            let inside = false;
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const xi = polygon[i][0], zi = polygon[i][1];
+                const xj = polygon[j][0], zj = polygon[j][1];
 
-            const intersect =
-            zi > z !== zj > z &&
-            x < ((xj - xi) * (z - zi)) / (zj - zi + 0.000001) + xi;
-            if (intersect) inside = !inside;
-        }
-        return inside;
+                const intersect =
+                zi > z !== zj > z &&
+                x < ((xj - xi) * (z - zi)) / (zj - zi + 0.000001) + xi;
+                if (intersect) inside = !inside;
+            }
+            return inside;
         }
 
         const isInside = pointInPolygon(heliX, heliZ, polygon);
@@ -487,7 +486,7 @@ export class MyHeli extends CGFobject {
             closest = validOrientation;
             minDifference = difference;
         }
-
+        
         return closest;
     }
 
