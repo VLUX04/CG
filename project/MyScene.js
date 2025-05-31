@@ -153,7 +153,7 @@ export class MyScene extends CGFscene {
   checkKeys() {
     const h = this.helicopter;
     const pressing = (key) => this.gui.isKeyPressed(key);
-    const canMove = !h.isAtRest && !h.heliLifting && !h.heliGettingWater && !h.heliGoingHome && h.y > 24;
+    const canMove = !h.isAtRest && !h.heliLifting && !h.heliGettingWater && !h.heliGoingHome && h.y > 24 && !h.isDroppingWater;
 
     let moved = false;
 
@@ -176,15 +176,15 @@ export class MyScene extends CGFscene {
       
     }
 
-    if (pressing("KeyP") && !h.heliGettingWater) {
+    if (pressing("KeyP") && !h.heliGettingWater && !h.heliGoingHome && !h.heliLifting && !h.isDroppingWater) {
       h.heliLifting = true;
       h.startingLift = true;
       moved = true;
     }
 
-    if (pressing("KeyL") && !h.heliGettingWater && !h.isAtRest) {
-      if(h.vx < 0.1 && h.vz < 0.1 && h.vx > -0.1 && h.vz > -0.1) {
-        if (h.isHeliAboveLake() && !h.hasWater && h.vx) {
+    if (pressing("KeyL") && !h.heliGettingWater && !h.isAtRest && !h.heliGoingHome && !h.heliLifting && !h.isDroppingWater) {
+      if (h.vx < 0.1 && h.vz < 0.1 && h.vx > -0.1 && h.vz > -0.1){
+        if (h.isHeliAboveLake() && !h.hasWater) {
           h.heliGettingWater = true;
         } else if (!h.hasWater) {
           h.heliGoingHome = true;
@@ -195,10 +195,15 @@ export class MyScene extends CGFscene {
     if (pressing("KeyR")) {
       h.reset();
     }
-    if (pressing("KeyO") && h.hasWater && !h.isDroppingWater) {
-      h.hasWater = false;
-      h.isDroppingWater = true;
-      h.waterDropTime = 0;  
+    if (pressing("KeyO") && h.hasWater && !h.isDroppingWater && !h.heliLifting && h.vx < 0.1 && h.vz < 0.1 && h.vx > -0.1 && h.vz > -0.1) {
+      this.firePositions.forEach((flag, pos) => {
+        if (this.isInsideCircle(h.x * 0.6, h.z * 0.6 - 39, pos[0], pos[2], 3) && flag) {
+          h.hasWater = false;
+          h.isDroppingWater = true;
+          h.waterDropTime = 0;  
+
+        }
+      });
     }
 
     if (h.isDroppingWater && h.waterDropProgress >= 0.95) {
@@ -217,6 +222,7 @@ export class MyScene extends CGFscene {
           this.firePositions.set(positions[i], false);
         }
         h.isDroppingWater = false; 
+        h.waterDropProgress = 0;
         h.waterDropTime = 0;      
       }
     }
