@@ -1,10 +1,10 @@
 # CG 2024/2025
 
-## Group T0xG0y
+## Group T04G09
 | Name             | Number    | E-Mail             |
 | ---------------- | --------- | ------------------ |
-| John Doe         | 201901010 | ...                |
-| Jane Doe         | 201901011 | ...                |
+| José Granja         | 202205143 | up202205143@up.pt                |
+| Leonardo Ribeiro         | 202205144 | up202205144@up.pt                |
 
 ----
 
@@ -13,4 +13,4 @@
   - [tp3](tp3/README.md)
   - [tp4](tp4/README.md)
   - [tp5](tp5/README.md)
-  - [Project](proj/README.md)
+  - [Project](project/README.md)
