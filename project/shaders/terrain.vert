@@ -9,8 +9,8 @@ uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform float timeFactor;
 
-uniform sampler2D uSampler1; // water map
-uniform sampler2D uSampler2; // terrain mask
+uniform sampler2D uSampler1;
+uniform sampler2D uSampler2; 
 
 out vec2 vTextureCoord;
 
@@ -20,7 +20,7 @@ void main() {
     float mask = texture(uSampler2, aTextureCoord / 10.0).r;
     vec3 offset = vec3(0.0);
 
-    if (mask == 0.0) { // water area
+    if (mask == 0.0) {
         float waterHeight = texture(uSampler1, aTextureCoord + vec2(0.01 * timeFactor)).b;
         offset = aVertexNormal * 0.1 * waterHeight;
     }
