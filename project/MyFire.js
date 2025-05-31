@@ -72,8 +72,12 @@ export class MyFire extends CGFobject {
                     const baseIdx = vertices.length / 3;
 
                     vertices.push(...interp0, ...interp1, ...interp2, ...interp3);
+
                     indices.push(baseIdx, baseIdx + 2, baseIdx + 1);
                     indices.push(baseIdx + 1, baseIdx + 2, baseIdx + 3);
+
+                    indices.push(baseIdx + 1, baseIdx + 2, baseIdx);
+                    indices.push(baseIdx + 3, baseIdx + 2, baseIdx + 1);
 
                     texCoords.push(
                         0, t0,
