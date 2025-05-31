@@ -178,7 +178,7 @@ export class MyScene extends CGFscene {
 
     if (pressing("KeyP") && !h.heliGettingWater && !h.heliGoingHome && !h.heliLifting && !h.isDroppingWater && !h.stopping) {
       h.heliLifting = true;
-      h.startingLift = true;
+      if(h.isAtRest) h.startingLift = true;
       moved = true;
     }
 
@@ -197,7 +197,7 @@ export class MyScene extends CGFscene {
     }
     if (pressing("KeyO") && h.hasWater && !h.isDroppingWater && !h.heliLifting && h.vx < 0.1 && h.vz < 0.1 && h.vx > -0.1 && h.vz > -0.1) {
       this.firePositions.forEach((flag, pos) => {
-        if (this.isInsideCircle(h.x * 0.6, h.z * 0.6 - 39, pos[0], pos[2], 3) && flag) {
+        if (this.isInsideCircle(h.x * 0.6, h.z * 0.6 - 39, pos[0], pos[2], 4) && flag) {
           h.hasWater = false;
           h.isDroppingWater = true;
           h.waterDropTime = 0;  
@@ -263,19 +263,18 @@ export class MyScene extends CGFscene {
     this.helicopter.updateHelice();
     const heli = this.helicopter;
     if (this.heliportBlend === undefined) this.heliportBlend = 0;
+    if (this.heliportBlend === undefined) this.heliportMode = "H";
 
     if (heli.heliLifting && heli.x < 0.5 && heli.z < 0.5) {
+      this.heliportMode = "UP";
       this.heliportBlend = (Math.floor(t / 400) % 2 === 0) ? 1.0 : 0.0;
     } else if (heli.heliGoingHome && heli.x < 0.5 && heli.z < 0.5 && heli.orientation < 0.05) {
+      this.heliportMode = "DOWN";
       this.heliportBlend = (Math.floor(t / 350) % 2 === 0) ? 1.0 : 0.0;
     } 
     else this.heliportBlend = 0.0;
 
-    this.building.setHeliportTexture(
-        heli.heliLifting ? "UP" : 
-        (heli.heliGoingHome && heli.orientation < 0.05 ? "DOWN" : "H")
-    );
-
+    this.building.setHeliportTexture(this.heliportMode);
     this.isBlinking = (heli.heliLifting || heli.heliGoingHome) && heli.x < 0.5 && heli.z < 0.5;
 
     this.heliportShader.setUniformsValues({ blendFactor: this.heliportBlend, uTexture1: 0, uTexture2: 1 });

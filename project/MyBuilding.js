@@ -177,5 +177,4 @@ export class MyBuilding extends CGFobject {
         this.letreiro.display();
         this.scene.popMatrix();
     }
-
 }
