@@ -1,6 +1,7 @@
+#version 300 es
 precision mediump float;
 
-attribute vec3 aVertexPosition;
+in vec3 aVertexPosition;
 
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
