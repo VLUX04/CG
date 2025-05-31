@@ -24,6 +24,8 @@ export class MyScene extends CGFscene {
 
     this.speedFactor = 3;
     this.heliportHeight = 3.33 * (this.numFloors - 3);
+    this.heliportBlend = 0;
+    this.heliportMode = "H";
 
     this.lakePosition = { x: 25, z: 0 };
     this.lakeSize = { width: 30, depth: 30 }; 
@@ -81,10 +83,8 @@ export class MyScene extends CGFscene {
   }
 
   initShaders() {
-    this.testShaders = [
-      new CGFshader(this.gl, "shaders/terrain.vert", "shaders/terrain.frag"),
-      new CGFshader(this.gl, "shaders/fire.vert", "shaders/fire.frag"),
-    ];
+    this.terrainShader = new CGFshader(this.gl, "shaders/terrain.vert", "shaders/terrain.frag"),
+    this.fireShader = new CGFshader(this.gl, "shaders/fire.vert", "shaders/fire.frag"),
     this.heliportShader = new CGFshader(this.gl, "shaders/heliport.vert", "shaders/heliport.frag");
     this.blinkingLightShader = new CGFshader(this.gl, "shaders/heliportLight.vert", "shaders/heliportLight.frag");
   }
@@ -108,7 +108,7 @@ export class MyScene extends CGFscene {
     );
     this.panorama = new MyPanorama(this, this.skyTexture);
     this.forest = new MyForest(this, this.forestRows, this.forestCols, this.forestWidth, this.forestHeight, this.trunkTexture, this.canopyTexture);
-    this.fire = new MyFire(this, 6, 1.5)
+    this.fire = new MyFire(this, 6, 1.5);
     this.firePositions = this.generateFirePositions(this.forest, this.minDistance);
   }
 
@@ -256,26 +256,31 @@ export class MyScene extends CGFscene {
     this.helicopter.update()
   }
 
+  updateHeliportStatus(t, heli) {
+    const nearHeliport = heli.x < 0.5 && heli.z < 0.5;
+
+    if (nearHeliport && heli.heliLifting) {
+      this.heliportMode = "UP";
+      this.heliportBlend = (Math.floor(t / 400) % 2 === 0) ? 1.0 : 0.0;
+    } else if (nearHeliport && heli.heliGoingHome && heli.orientation < 0.05) {
+      this.heliportMode = "DOWN";
+      this.heliportBlend = (Math.floor(t / 350) % 2 === 0) ? 1.0 : 0.0;
+    } else {
+      this.heliportMode = "H";
+      this.heliportBlend = 0.0;
+    }
+  }
+
   update(t) {
-    this.testShaders[0].setUniformsValues({ timeFactor: t / 100 % 100 });
+    this.terrainShader.setUniformsValues({ timeFactor: t / 100 % 100 });
+
     this.checkKeys();
     this.helicopter.update();
     this.helicopter.updateHelice();
-    const heli = this.helicopter;
-    if (this.heliportBlend === undefined) this.heliportBlend = 0;
-    if (this.heliportBlend === undefined) this.heliportMode = "H";
-
-    if (heli.heliLifting && heli.x < 0.5 && heli.z < 0.5) {
-      this.heliportMode = "UP";
-      this.heliportBlend = (Math.floor(t / 400) % 2 === 0) ? 1.0 : 0.0;
-    } else if (heli.heliGoingHome && heli.x < 0.5 && heli.z < 0.5 && heli.orientation < 0.05) {
-      this.heliportMode = "DOWN";
-      this.heliportBlend = (Math.floor(t / 350) % 2 === 0) ? 1.0 : 0.0;
-    } 
-    else this.heliportBlend = 0.0;
-
+  
+    this.updateHeliportStatus(t, this.helicopter);
     this.building.setHeliportTexture(this.heliportMode);
-    this.isBlinking = (heli.heliLifting || heli.heliGoingHome) && heli.x < 0.5 && heli.z < 0.5;
+    this.isBlinking = (this.helicopter.heliLifting || this.helicopter.heliGoingHome) && this.helicopter.x < 0.5 && this.helicopter.z < 0.5;
 
     this.heliportShader.setUniformsValues({ blendFactor: this.heliportBlend, uTexture1: 0, uTexture2: 1 });
     this.blinkingLightShader.setUniformsValues({ uBlink: this.heliportBlend, uColor: [1.0, 1.0, 0.0] }); 
@@ -288,7 +293,6 @@ export class MyScene extends CGFscene {
     const maxDistance = 100;
     const pos = this.camera.position;
     const distance = Math.sqrt(pos[0] ** 2 + pos[1] ** 2 + pos[2] ** 2);
-
     if (distance > maxDistance) {
       const scale = maxDistance / distance;
       pos[0] *= scale;
@@ -320,8 +324,8 @@ export class MyScene extends CGFscene {
     this.setDefaultAppearance();
 
     // Lake and Terrain using Mask
-    this.setActiveShader(this.testShaders[0]);
-    this.testShaders[0].setUniformsValues({
+    this.setActiveShader(this.terrainShader);
+    this.terrainShader.setUniformsValues({
       uSampler: 0, // lake texture
       uSampler1: 1, // waterMap 
       uSampler2: 2, // terrainMask
@@ -363,8 +367,8 @@ export class MyScene extends CGFscene {
       if(flag){
         this.pushMatrix();
         this.translate(...pos);
-        this.setActiveShader(this.testShaders[1]);
-        this.testShaders[1].setUniformsValues({
+        this.setActiveShader(this.fireShader);
+        this.fireShader.setUniformsValues({
           uTime: performance.now() / 1000.0,
           uRandomness: 35 + 5,
         });

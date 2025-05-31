@@ -88,7 +88,6 @@ export class MyHeli extends CGFobject {
     }
 
     update() {
-
         if (this.y != this.heliportHeight && this.isAtRest) {
             this.y = this.heliportHeight;
         }
