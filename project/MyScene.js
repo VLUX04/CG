@@ -176,13 +176,13 @@ export class MyScene extends CGFscene {
       
     }
 
-    if (pressing("KeyP") && !h.heliGettingWater && !h.heliGoingHome && !h.heliLifting && !h.isDroppingWater) {
+    if (pressing("KeyP") && !h.heliGettingWater && !h.heliGoingHome && !h.heliLifting && !h.isDroppingWater && !h.stopping) {
       h.heliLifting = true;
       h.startingLift = true;
       moved = true;
     }
 
-    if (pressing("KeyL") && !h.heliGettingWater && !h.isAtRest && !h.heliGoingHome && !h.heliLifting && !h.isDroppingWater) {
+    if (pressing("KeyL") && !h.heliGettingWater && !h.isAtRest && !h.heliGoingHome && !h.heliLifting && !h.isDroppingWater && !h.startingLift) {
       if (h.vx < 0.1 && h.vz < 0.1 && h.vx > -0.1 && h.vz > -0.1){
         if (h.isHeliAboveLake() && !h.hasWater) {
           h.heliGettingWater = true;
